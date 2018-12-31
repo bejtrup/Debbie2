@@ -1,0 +1,72 @@
+a{
+    color: tomato;
+}
+.detail {
+    position: fixed;
+    -webkit-transform-origin: top left;
+    transform-origin: top left;
+}
+
+@media screen and (orientation: portrait) {
+    .detail {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+@media screen and (orientation: landscape) {
+    .detail {
+        top: 0;
+        left: 25%;
+        right: 25%;
+        bottom: 0;
+    }
+    /* 1vw = 6 timer */
+    .duration-200 {
+        min-width: 33.333vw;
+        max-width: 33.333vw;
+    }
+    .duration-230 {
+        min-width: 41.6666vw;
+        max-width: 41.6666vw;
+    }
+}
+
+.active{
+    transform: scale(1.5);
+}
+
+.iframeContainer{
+    height: 60vh;
+    max-height: 450px;
+}
+.ratebar .em-svg{
+    height: 3em;
+    width: 3em;
+}
+
+.bg-loading{
+    background: linear-gradient(-45deg, #5db09b, #cbece4, #5db09b);
+
+    -webkit-animation: AnimationName 1s ease infinite;
+    -moz-animation: AnimationName 1s ease infinite;
+    animation: AnimationName 1s ease infinite; 
+}
+  
+@-webkit-keyframes AnimationName {
+    0%{background-size:100% 300%;}
+    50%{background-size:100% 400%}
+    100%{background-size:100% 300%}
+}
+@-moz-keyframes AnimationName {
+    0%{background-size:100% 300%;}
+    50%{background-size:100% 400%}
+    100%{background-size:100% 300%}
+}
+@keyframes AnimationName { 
+    0%{background-size:100% 100%;}
+    50%{background-size:100% 200%}
+    100%{background-size:100% 100%}
+}
