@@ -61,6 +61,7 @@ a{
 }
 
 .bg-loading{
+    border-radius: 10px;
     background: linear-gradient(-45deg, #5db09b, #cbece4, #5db09b);
 
     -webkit-animation: AnimationName 1s ease infinite;

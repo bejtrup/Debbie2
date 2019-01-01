@@ -2,6 +2,8 @@ var appSettings = [];
 var bands = [];
 var spData = null;
 var localStoragedReatings = [];
+
+//https://gist.github.com/terrywbrady/a03b25fe42959b304b1e
 const events = [
     {
         eventId: 0,
@@ -11,7 +13,7 @@ const events = [
     {
         eventId: 1,
         eventName: "Copenhell",
-        event_db_url: "https://spreadsheets.google.com/feeds/cells/1ZXiACjzGY4lCYWABOhL9JLWOpcdvAhXoBE7IXjMqdXw/1/public/values?alt=json-in-script&callback=doData",
+        event_db_url: "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/2/public/values?alt=json-in-script&callback=doData"
     }
 ];
 
