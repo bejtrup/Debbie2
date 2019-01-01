@@ -17,10 +17,16 @@
 
 </head>
 <body class="p-3">
-        <div class="row">
-        <h1 class="col-12 text-center">Roskilde</h1>
+    <div class="row py-3">
+        <div class="col-12 d-flex justify-content-center align-items-center">
+            <i class="em-svg em-musical_note mr-3 em-xl"></i>
+            <span id="eventSelectorWrapper" style="min-width: 195px;"></span>
+        </div>
     </div>
     <div id="bandlist" class="p-3"></div>
+    <button class="btn btn-danger" onclick="localStorage.clear(); location.reload();">slet alt</button>
     <div class="detail row bg-primary p-3" data-id="" style="display: none;"></div>
+
+    <!-- <div id="cl" class="cl"></div> -->
 </body>
 </html>
