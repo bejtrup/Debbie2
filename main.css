@@ -17,20 +17,32 @@ a{
 }
 
 @media screen and (orientation: landscape) {
-    .detail {
+    /* .detail {
         top: 0;
         left: 25%;
         right: 25%;
         bottom: 0;
-    }
+    } */
     /* 1vw = 6 timer */
-    .duration-200 {
+    /* .duration-200 {
         min-width: 33.333vw;
         max-width: 33.333vw;
     }
     .duration-230 {
         min-width: 41.6666vw;
         max-width: 41.6666vw;
+    } */
+    body * {
+        display: none!important;
+    }
+    body:after {
+        content: "Her kommer du til at kunne se musikprogrammet, når vi engang kender det :)";
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        top: 50%;
+        font-size: 1rem;
+        margin-top: -1rem; 
     }
 }
 
@@ -42,7 +54,8 @@ a{
     height: 60vh;
     max-height: 450px;
 }
-.ratebar .em-svg{
+ 
+.ratebar .em-svg, .em-xl{
     height: 3em;
     width: 3em;
 }
@@ -69,4 +82,21 @@ a{
     0%{background-size:100% 100%;}
     50%{background-size:100% 200%}
     100%{background-size:100% 100%}
+}
+
+/* BOOTSTRAP HACKS*/
+.custom-select-lg {
+    height: 58px;
+    padding-top: .375rem;
+    padding-bottom: .375rem;
+    font-size: 200%;
+}
+
+.cl {
+    position: fixed;
+    z-index: 2000;
+    bottom: 20px;
+    width: 100%;
+    background: #333;
+    color: tomato;
 }

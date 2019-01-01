@@ -1,14 +1,47 @@
+var appSettings = [];
 var bands = [];
 var spData = null;
 var localStoragedReatings = [];
+const events = [
+    {
+        eventId: 0,
+        eventName: "Roskilde",
+        event_db_url: "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/1/public/values?alt=json-in-script&callback=doData"
+    },
+    {
+        eventId: 1,
+        eventName: "Copenhell",
+        event_db_url: "https://spreadsheets.google.com/feeds/cells/1ZXiACjzGY4lCYWABOhL9JLWOpcdvAhXoBE7IXjMqdXw/1/public/values?alt=json-in-script&callback=doData",
+    }
+];
 
 window.onload = function(){
-    getDB();
+    getSettingsFromLS();
+    makeEventSelector();
+    getDB(events[appSettings[0].eventSelected].event_db_url);
 }
-function getDB(){
-    var url = "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/1/public/values?alt=json-in-script&callback=doData";
+function getSettingsFromLS() {
+    if( localStorage.getItem("appSettings") ){
+        appSettings = JSON.parse(localStorage.getItem("appSettings"));
+      } else {
+        appSettings.push({eventSelected: 0}) 
+        localStorage.setItem('appSettings', JSON.stringify(appSettings));
+      }
+}
+function makeEventSelector() {
+    const SelectorHTML = `
+    <select onchange="changeEvent(this);" class="custom-select custom-select-lg px-4">
+        ${events.map(event => `
+        <option value="${event.eventId}" ${event.eventId == appSettings[0].eventSelected ? 'selected' : ''}>${event.eventName}</option>
+        `).join('')}
+    </select>`;
+    document.getElementById('eventSelectorWrapper').innerHTML = SelectorHTML;
+}  
+
+function getDB(db_url){
+    document.getElementById("bandlist").innerHTML = "henter bands...";
     var script = document.createElement('script');
-    script.src = url;
+    script.src = db_url;
     document.head.appendChild(script);
 }
 
@@ -17,8 +50,17 @@ function doData(json) {
     makeBands();
 }
 
+function changeEvent(_this){
+    let eventId = _this.value;
+    appSettings[0].eventSelected = eventId; 
+    localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    getDB(events[eventId].event_db_url);
+}
+
+
 // Lav om sådan at key ikke = id ( så man kan soter array )
 function makeBands() {
+    document.getElementById("bandlist").innerHTML = "henter data...";
     var data = spData;
     var key = 0;
     for(var r=0; r<data.length; r++) {
@@ -46,30 +88,36 @@ function makeBands() {
             }
         }
     }
-    console.log(bands);
-
     pushReatingToBands();
     makeBandlistHTML();
     clickOpenDetils();
 }
 
-//Ratinf skal kobles på band id, ikke band array key
 function pushReatingToBands(){
     if( localStorage.getItem("localStoragedReatings") ){
         localStoragedReatings = JSON.parse(localStorage.getItem("localStoragedReatings"));
       } else {
+          for (let index = 0; index < events.length; index++) {
+            localStoragedReatings.push([]);
+              
+          }
         localStorage.setItem('localStoragedReatings', JSON.stringify(localStoragedReatings));
       }
       for (let index = 0; index < bands.length; index++) {
-        bands[index].rating = localStoragedReatings[index] ? localStoragedReatings[index] : 0;          
+        var band = bands.find(function(element) {
+            return element.id == index;
+        });
+        band.rating = localStoragedReatings[appSettings[0].eventSelected][index] ? localStoragedReatings[appSettings[0].eventSelected][index] : 0;          
       }
+      // CL document.getElementById("cl").innerHTML = localStoragedReatings[0] +"::"+ localStoragedReatings[1] 
 }
-function setRating(_this, id,rating){
+function setRating(_this, id, rating){
+    console.log(_this, id, rating);
     _this.classList.add("active");
     for (let sibling of _this.parentNode.children) {
         if (sibling !== _this) sibling.classList.remove('active');
     }
-    localStoragedReatings[id] = rating;
+    localStoragedReatings[appSettings[0].eventSelected][id] = rating;
     localStorage.setItem('localStoragedReatings', JSON.stringify(localStoragedReatings));
     document.querySelector('[data-id="'+id+'"]').querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
     return false;
@@ -234,7 +282,6 @@ function makeBandCardBig(id){
     `
 }
 
-
 function nextBand(bandId){
     const bandDetail = document.querySelector('.detail');
     var slideOut = bandDetail.animate([
@@ -356,3 +403,4 @@ function showPrevDetailView(){
             <a href="">${bands[id].note != "" ? bands[id].note : "Tilføj en note"}</a>
         </div>
 */
+//localStorage.clear();
