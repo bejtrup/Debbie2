@@ -177,7 +177,6 @@ function clickOpenDetils(){
       band.addEventListener('click', () => {
         const itemImage = band.querySelector('.band-card');
         bandDetail.setAttribute('data-id', band.getAttribute('data-id'));
-        console.log( band.getAttribute('data-id') );
         bandDetail.style.display = 'block';
         band.style.opacity = 0;
         
@@ -279,17 +278,15 @@ function makeBandCardBig(activeBand){
             <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `active` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
         </div>
         <div class="d-flex mt-3 px-5">
-        ${activeBand.id == 0 ? ``: `<a href="" onclick="return prevBand(${activeBand.id})"><i class="em em-arrow_up"></i> Forige Band</a>`}
-        ${activeBand.id == bands.length-1 ? ``: `<a href="" onclick="return nextBand(${activeBand.id})" class="ml-auto">Næste Band <i class="em em-arrow_down"></i></i></a>`}
+        ${activeBand.id == parseInt(bands[0].id) ? ``: `<a href="" onclick="return prevBand(${activeBand.id})"><i class="em em-arrow_up"></i> Forige Band</a>`}
+        ${activeBand.id == parseInt(bands[bands.length-1].id) ? ``: `<a href="" onclick="return nextBand(${activeBand.id})" class="ml-auto">Næste Band <i class="em em-arrow_down"></i></i></a>`}
         </div>
     </div>
     `
 }
 
 
-// NEXT AND PREV NOT ON BANDS WIDT NOT SHOW RATING
-
-
+// NEXT AND PREV NOT ON BANDS WIDT NOT SHOW RATING  OG NEXT/PREV EFTER RÆKKEFØLGE I BANDS
 
 function nextBand(bandId){
     const bandDetail = document.querySelector('.detail');
@@ -316,7 +313,9 @@ function nextBand(bandId){
         itemImage.style.opacity = 1;
         bandDetail.innerHTML = '';
         bandDetail.style.display = 'none';
-        bandDetail.setAttribute('data-id', bandId+1);
+          
+        var activeBand_index = bands.findIndex(band => band.id == bandId);
+        bandDetail.setAttribute('data-id', bands[activeBand_index + 1].id);
         makeDetailView();
         showNextDetailView();
       };
@@ -374,7 +373,8 @@ function prevBand(bandId){
         itemImage.style.opacity = 1;
         bandDetail.innerHTML = '';
         bandDetail.style.display = 'none';
-        bandDetail.setAttribute('data-id', bandId-1);
+        var activeBand_index = bands.findIndex(band => band.id == bandId);
+        bandDetail.setAttribute('data-id', bands[activeBand_index - 1 ].id);
         makeDetailView();
         showPrevDetailView();
       };
