@@ -6,7 +6,36 @@ a{
     -webkit-transform-origin: top left;
     transform-origin: top left;
 }
-
+.settingsMenu {
+    position: fixed;
+    background: tomato;
+    bottom: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+.FilterToggle {
+    width: 7rem;
+    border-radius: 3rem;
+    transition: 0.4s;
+}
+.FilterToggle .em-svg{
+    transition: 0.4s;
+}
+.FilterToggle.on {
+    background: red;
+}
+.FilterToggle.on .em-svg{
+    transform: translateX(3.5rem);
+}
+.FilterToggle.off {
+    background: #333;   
+}
+.FilterToggle.off .em-svg{
+    transform: translateX(0);
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+}
 @media screen and (orientation: portrait) {
     .detail {
         top: 0;
@@ -55,7 +84,7 @@ a{
     max-height: 450px;
 }
  
-.ratebar .em-svg, .em-xl{
+.ratebar .em-svg, .em-xl, .FilterToggle .em-svg{
     height: 3em;
     width: 3em;
 }

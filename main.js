@@ -1,4 +1,3 @@
-var appSettings = [];
 var bands = [];
 var spData = null;
 var localStoragedReatings = [];
@@ -22,14 +21,7 @@ window.onload = function(){
     makeEventSelector();
     getDB(events[appSettings[0].eventSelected].event_db_url);
 }
-function getSettingsFromLS() {
-    if( localStorage.getItem("appSettings") ){
-        appSettings = JSON.parse(localStorage.getItem("appSettings"));
-      } else {
-        appSettings.push({eventSelected: 0}) 
-        localStorage.setItem('appSettings', JSON.stringify(appSettings));
-      }
-}
+
 function makeEventSelector() {
     const SelectorHTML = `
     <select onchange="changeEvent(this);" class="custom-select custom-select-lg px-4">
@@ -65,6 +57,7 @@ function makeBands() {
     document.getElementById("bandlist").innerHTML = "henter data...";
     var data = spData;
     var key = 0;
+    bands = [];
     for(var r=0; r<data.length; r++) {
         var cell = data[r]["gs$cell"];
         var val = cell["$t"];
@@ -86,13 +79,16 @@ function makeBands() {
                 bands[key].duration = val;
             }
             if(cell.col == "6"){
+                bands[key].stage = val.split("_")[0];
+            }
+            if(cell.col == "7"){
                 bands[key].iframe = val;
             }
         }
     }
     pushReatingToBands();
+    SortBands();
     makeBandlistHTML();
-    clickOpenDetils();
 }
 
 function pushReatingToBands(){
@@ -114,20 +110,29 @@ function pushReatingToBands(){
       // CL document.getElementById("cl").innerHTML = localStoragedReatings[0] +"::"+ localStoragedReatings[1] 
 }
 function setRating(_this, id, rating){
-    console.log(_this, id, rating);
     _this.classList.add("active");
     for (let sibling of _this.parentNode.children) {
         if (sibling !== _this) sibling.classList.remove('active');
     }
     localStoragedReatings[appSettings[0].eventSelected][id] = rating;
     localStorage.setItem('localStoragedReatings', JSON.stringify(localStoragedReatings));
-    document.querySelector('[data-id="'+id+'"]').querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
+    var activeband = bands.find(band => band.id == id );
+    activeband.rating = rating;
+    if(appSettings[1].filterRatings[rating] == 1){
+        document.querySelector('.band[data-id="'+id+'"]').querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
+    } else {
+        var element = document.querySelector('.band[data-id="'+id+'"]')
+        element.parentNode.removeChild(element);
+    }
+
+
     return false;
 }
 
 function makeBandlistHTML(){
     const bandCard_Small = 
     `${bands.map(band => `
+        ${appSettings[1].filterRatings[band.rating] == 1 ? `
         <div class="band row mb-3 duration-${band.duration}" data-id="${band.id}">
             <div class="band-card col-12 bg-primary p-3 d-flex align-items-center">
                 <div class="mr-3">
@@ -138,10 +143,10 @@ function makeBandlistHTML(){
                 </div>
             </div>
         </div>
+    `: ``}    
     `).join('')}`;
     document.getElementById("bandlist").innerHTML = bandCard_Small;
-
-    // on iframe loaded = $(".ytp-playlist-menu-button-icon").click() = open menu
+    clickOpenDetils();
 }
 
 function getIconName(rate){
@@ -176,7 +181,6 @@ function clickOpenDetils(){
       band.addEventListener('click', () => {
         const itemImage = band.querySelector('.band-card');
         bandDetail.setAttribute('data-id', band.getAttribute('data-id'));
-        
         bandDetail.style.display = 'block';
         band.style.opacity = 0;
         
@@ -254,35 +258,39 @@ function clickCloseDetils(){
 }
 
 function makeDetailView(){
-    document.querySelector('.detail').innerHTML = makeBandCardBig(document.querySelector('.detail').getAttribute('data-id'));
+    var band = bands.find(band => band.id == document.querySelector('.detail').getAttribute('data-id'));
+    document.querySelector('.detail').innerHTML = makeBandCardBig(band);
     document.querySelector('.close-details').addEventListener('click', (e) => {
         e.preventDefault();
         clickCloseDetils();
     });
 }
 
-function makeBandCardBig(id){
+function makeBandCardBig(activeBand){
     return`
     <div class="col-12 d-flex flex-column h-100">
         <div class="d-flex justify-content-between">
-            <h1>${bands[id].name}</h1>
+            <h1>${activeBand.name}</h1>
             <a class="close-details" href=""><i class="em em-x"></i></a>
         </div>
-        <div class="iframeContainer bg-loading">${bands[id].iframe}</div>
-        <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(bands[id].name)}" target='_blank'>Find i spotify</a></div>
+        <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
+        <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
         <div class="ratebar mt-auto d-flex justify-content-around py-3">
-            <a href="" onclick="return setRating(this, ${bands[id].id},1);" class="${bands[id].rating == 1 ? `active` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
-            <a href="" onclick="return setRating(this, ${bands[id].id},2);" class="${bands[id].rating == 2 ? `active` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
-            <a href="" onclick="return setRating(this, ${bands[id].id},3);" class="${bands[id].rating == 3 ? `active` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
-            <a href="" onclick="return setRating(this, ${bands[id].id},4);" class="${bands[id].rating == 4 ? `active` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
+            <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `active` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
+            <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `active` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
+            <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `active` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
+            <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `active` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
         </div>
         <div class="d-flex mt-3 px-5">
-        ${bands[id].id == 0 ? ``: `<a href="" onclick="return prevBand(${bands[id].id})"><i class="em em-arrow_up"></i> Forige Band</a>`}
-        ${bands[id].id == bands.length-1 ? ``: `<a href="" onclick="return nextBand(${bands[id].id})" class="ml-auto">Næste Band <i class="em em-arrow_down"></i></i></a>`}
+        ${activeBand.id == parseInt(bands[0].id) ? ``: `<a href="" onclick="return prevBand(${activeBand.id})"><i class="em em-arrow_up"></i> Forige Band</a>`}
+        ${activeBand.id == parseInt(bands[bands.length-1].id) ? ``: `<a href="" onclick="return nextBand(${activeBand.id})" class="ml-auto">Næste Band <i class="em em-arrow_down"></i></i></a>`}
         </div>
     </div>
     `
 }
+
+
+// NEXT AND PREV NOT ON BANDS WIDT NOT SHOW RATING  OG NEXT/PREV EFTER RÆKKEFØLGE I BANDS
 
 function nextBand(bandId){
     const bandDetail = document.querySelector('.detail');
@@ -309,7 +317,9 @@ function nextBand(bandId){
         itemImage.style.opacity = 1;
         bandDetail.innerHTML = '';
         bandDetail.style.display = 'none';
-        bandDetail.setAttribute('data-id', bandId+1);
+          
+        var activeBand_index = bands.findIndex(band => band.id == bandId);
+        bandDetail.setAttribute('data-id', bands[activeBand_index + 1].id);
         makeDetailView();
         showNextDetailView();
       };
@@ -367,7 +377,8 @@ function prevBand(bandId){
         itemImage.style.opacity = 1;
         bandDetail.innerHTML = '';
         bandDetail.style.display = 'none';
-        bandDetail.setAttribute('data-id', bandId-1);
+        var activeBand_index = bands.findIndex(band => band.id == bandId);
+        bandDetail.setAttribute('data-id', bands[activeBand_index - 1 ].id);
         makeDetailView();
         showPrevDetailView();
       };
@@ -405,4 +416,17 @@ function showPrevDetailView(){
             <a href="">${bands[id].note != "" ? bands[id].note : "Tilføj en note"}</a>
         </div>
 */
+
+function arraySort(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
+
 //localStorage.clear();
