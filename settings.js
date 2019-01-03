@@ -5,6 +5,7 @@ function getSettingsFromLS() {
       } else {
         appSettings.push({eventSelected: 0}) 
         appSettings.push({filterRatings: [1,1,1,1,1]})
+        appSettings.push({listSort: 0})
         localStorage.setItem('appSettings', JSON.stringify(appSettings));
       }
 }
@@ -16,9 +17,9 @@ function openSettings(){
         <div class="col-12 d-flex align-items-center justify-content-center">
             <h4 class="pr-3">Sotér</h4>   
             <select id="sortSelector" class="custom-select">
-                    <option value="0" selected>Hovedenavne</option>
-                    <option value="1">A-Å</option>
-                    <option value="2">Efter spilletidspunkt</option>
+                    <option value="0" ${appSettings[2].listSort == 0 ? `selected` : ``}>Hovedenavne</option>
+                    <option value="1" ${appSettings[2].listSort == 1 ? `selected` : ``}>A-Å</option>
+                    <option value="2" ${appSettings[2].listSort == 2 ? `selected` : ``}>Efter spilletidspunkt</option>
             </select>
         </div> 
         <h4 class="col-12 text-center mt-3">Vis:</h4>   
@@ -53,11 +54,30 @@ function toggleFilterRating(_this, filterRatingId){
 }
 
 function SubmitSettings(){
-    document.getElementById("settingsMenu").innerHTML = '';
     document.getElementById("bandlist").innerHTML = "henter bands...";
+    
+    appSettings[2].listSort = document.getElementById("sortSelector").value;
+    localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    SortBands();
 
-    // check hvad sortSelector er
-    bands.sort(arraySort("name"));
-
+    document.getElementById("settingsMenu").innerHTML = '';
     makeBandlistHTML();
+}
+
+function SortBands(){
+    switch (appSettings[2].listSort) {
+        case "0":
+        bands.sort(arraySort("id"));
+        break;
+        case "1":
+        bands.sort(arraySort("name"));
+        break;
+        case "0":
+        // AND TIME
+        bands.sort(arraySort("date"));
+        break;
+        
+        default:
+        break;
+    }
 }

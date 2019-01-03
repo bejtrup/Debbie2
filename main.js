@@ -79,7 +79,7 @@ function makeBands() {
                 bands[key].duration = val;
             }
             if(cell.col == "6"){
-                bands[key].stage = val;
+                bands[key].stage = val.split("_")[0];
             }
             if(cell.col == "7"){
                 bands[key].iframe = val;
@@ -87,6 +87,7 @@ function makeBands() {
         }
     }
     pushReatingToBands();
+    SortBands();
     makeBandlistHTML();
 }
 
