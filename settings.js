@@ -18,7 +18,7 @@ function openSettings(){
             <select id="sortSelector" class="custom-select">
                     <option value="0" selected>Hovedenavne</option>
                     <option value="1">A-Å</option>
-                    <option value="2">Efter Dag</option>
+                    <option value="2">Efter spilletidspunkt</option>
             </select>
         </div> 
         <h4 class="col-12 text-center mt-3">Vis:</h4>   
@@ -31,7 +31,7 @@ function openSettings(){
             `}).join('')}
         </div>
         <div class="col-12 text-center">
-            <button onclick="SubmitSettings();">Færdig</button>
+            <button class="btn btn-susses" onclick="SubmitSettings();">Færdig</button>
         </div>
     `;
     document.getElementById("settingsMenu").innerHTML = settingsMenuHTML;
@@ -59,6 +59,5 @@ function SubmitSettings(){
     // check hvad sortSelector er
     bands.sort(arraySort("name"));
 
-    
     makeBandlistHTML();
 }

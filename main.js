@@ -79,6 +79,9 @@ function makeBands() {
                 bands[key].duration = val;
             }
             if(cell.col == "6"){
+                bands[key].stage = val;
+            }
+            if(cell.col == "7"){
                 bands[key].iframe = val;
             }
         }
