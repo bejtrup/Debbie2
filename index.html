@@ -5,6 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>DEBBIE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#000">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#000">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="#000">
+
     <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
@@ -29,7 +37,7 @@
     </div>
     <div id="bandlist" class="p-3"></div>
     <button class="btn btn-danger" onclick="localStorage.clear(); location.reload();">slet alt</button>
-    <div class="detail row bg-primary p-3" data-id="" style="display: none;"></div>
+    <div class="detail row p-3" data-id="" style="display: none;"></div>
     <div id="settingsMenu" class="settingsMenu pb-5"></div>
     <!-- <div id="cl" class="cl"></div> -->
 </body>

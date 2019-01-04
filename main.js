@@ -109,6 +109,8 @@ function pushReatingToBands(){
       }
       // CL document.getElementById("cl").innerHTML = localStoragedReatings[0] +"::"+ localStoragedReatings[1] 
 }
+
+
 function setRating(_this, id, rating){
     _this.classList.add("active");
     for (let sibling of _this.parentNode.children) {
@@ -119,22 +121,33 @@ function setRating(_this, id, rating){
     var activeband = bands.find(band => band.id == id );
     activeband.rating = rating;
     if(appSettings[1].filterRatings[rating] == 1){
-        document.querySelector('.band[data-id="'+id+'"]').querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
+        var band_card = document.querySelector('.band[data-id="'+id+'"]');
+        band_card.style.display = 'block';
+        removeClassByPrefix(band_card.querySelector(".band-card"),"bg-")
+        band_card.querySelector(".band-card").className += " " + getColor(rating);
+        band_card.classList.remove()
+        band_card.querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
     } else {
-        var element = document.querySelector('.band[data-id="'+id+'"]')
-        element.parentNode.removeChild(element);
+        document.querySelector('.band[data-id="'+id+'"]').style.display = 'none';
     }
-
+    const bandDetail = document.querySelector('.detail');
+    bandDetail.className = "detail row p-3 " + getColor(rating);
 
     return false;
 }
+function removeClassByPrefix(el, prefix) {
+    var regx = new RegExp('\\b' + prefix + '(.*)?\\b', 'g');
+    el.className = el.className.replace(regx, '');
+    return el;
+}
+
 
 function makeBandlistHTML(){
     const bandCard_Small = 
     `${bands.map(band => `
         ${appSettings[1].filterRatings[band.rating] == 1 ? `
-        <div class="band row mb-3 duration-${band.duration}" data-id="${band.id}">
-            <div class="band-card col-12 bg-primary p-3 d-flex align-items-center">
+        <div class="band row mb-2 " data-id="${band.id}">
+            <div class="band-card col-12 p-3 d-flex align-items-center rounded ${getColor(band.rating)}">
                 <div class="mr-3">
                         <i class="em-svg ${getIconName(band.rating)}"></i>      
                 </div>
@@ -149,6 +162,27 @@ function makeBandlistHTML(){
     clickOpenDetils();
 }
 
+function getColor(rate){
+    switch (rate) {
+        case 0:
+            return "bg-t text-t";
+            break;
+        case 1:
+            return "bg-s-darker text-s-darker";
+            break;
+        case 2:
+            return "bg-s-dark text-s-dark";
+            break;
+        case 3:
+            return "bg-s text-s";
+            break;
+        case 4:
+            return "bg-p text-p";
+            break;
+        default:
+            break;
+    }
+}
 function getIconName(rate){
     switch (rate) {
         case 0:
@@ -179,6 +213,9 @@ function clickOpenDetils(){
     
     allbands.forEach((band) => {
       band.addEventListener('click', () => {
+        var b = bands.find(x => x.id == band.getAttribute('data-id'));
+        bandDetail.className = "detail row p-3 " + getColor(b.rating);
+
         const itemImage = band.querySelector('.band-card');
         bandDetail.setAttribute('data-id', band.getAttribute('data-id'));
         bandDetail.style.display = 'block';
@@ -289,11 +326,13 @@ function makeBandCardBig(activeBand){
     `
 }
 
+// KUN NEXT/PREV PÅ BANDS/RATINGS DER IKKE ER SKJULT
 
-// NEXT AND PREV NOT ON BANDS WIDT NOT SHOW RATING  OG NEXT/PREV EFTER RÆKKEFØLGE I BANDS
 
 function nextBand(bandId){
     const bandDetail = document.querySelector('.detail');
+    var b = bands.find(x => x.id == bandId+1);
+    bandDetail.className = "detail row p-3 " + getColor(b.rating);
     var slideOut = bandDetail.animate([
         {
           zIndex: 2,
@@ -354,6 +393,8 @@ function showNextDetailView(){
 
 function prevBand(bandId){
     const bandDetail = document.querySelector('.detail');
+    var b = bands.find(x => x.id == bandId-1);
+    bandDetail.className = "detail row p-3 " + getColor(b.rating);
     var slideOut = bandDetail.animate([
         {
           zIndex: 2,
