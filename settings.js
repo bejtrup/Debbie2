@@ -3,7 +3,7 @@ function getSettingsFromLS() {
     if( localStorage.getItem("appSettings") ){
         appSettings = JSON.parse(localStorage.getItem("appSettings"));
       } else {
-        appSettings.push({eventSelected: 0}) 
+        appSettings.push({eventSelected: "0"}) 
         appSettings.push({filterRatings: [1,1,1,1,1]})
         appSettings.push({listSort: 0})
         localStorage.setItem('appSettings', JSON.stringify(appSettings));

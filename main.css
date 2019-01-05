@@ -23,18 +23,37 @@ body {
 .bg-p{
     background-color: var(--p);
 }
+.bg-p-s{
+    background-color: var(--p-s);
+}
 .bg-s{
     background-color: var(--s);
+}
+.bg-s-s{
+    background-color: var(--s)-s;
 }
 .bg-s-dark{
     background-color: var(--s-dark);
 }
+.bg-s-dark-s{
+    background-color: var(--s-dark-s);
+}
 .bg-s-darker{
     background-color: var(--s-darker);
+}
+.bg-s-darker-s{
+    background-color: var(--s-darker-s);
 }
 .bg-t{
     background-color: var(--t);
 }
+.bg-t-s{
+    background-color: var(--t-s);
+}
+.bg-em{
+    /* background-color: rgba(0,0,0,.15); */
+}
+
 .text-p{
     color: var(--p-s);
 }
@@ -50,11 +69,14 @@ body {
 .text-t{
     color: var(--t-s);
 }
-
-
 a{
     color: tomato;
 }
+
+h5 {
+    font-size: 1rem;
+}
+
 .detail {
     position: fixed;
     -webkit-transform-origin: top left;
@@ -185,5 +207,5 @@ a{
     color: tomato;
 }
 .rounded {
-    border-radius: 20px;
+    border-radius: 30px;
 }

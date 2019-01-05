@@ -148,11 +148,12 @@ function makeBandlistHTML(){
         ${appSettings[1].filterRatings[band.rating] == 1 ? `
         <div class="band row mb-2 " data-id="${band.id}">
             <div class="band-card col-12 p-3 d-flex align-items-center rounded ${getColor(band.rating)}">
-                <div class="mr-3">
+                <div class="mr-3 bg-em p-2 rounded-circle">
                         <i class="em-svg ${getIconName(band.rating)}"></i>      
                 </div>
                 <div>
                     <h4 class="m-0">${band.name}</h4>
+                    <h5 class="m-0">${getStage(band.stage)} : Tirsdag d. 29 kl 19:00</h5>
                 </div>
             </div>
         </div>
@@ -160,49 +161,6 @@ function makeBandlistHTML(){
     `).join('')}`;
     document.getElementById("bandlist").innerHTML = bandCard_Small;
     clickOpenDetils();
-}
-
-function getColor(rate){
-    switch (rate) {
-        case 0:
-            return "bg-t text-t";
-            break;
-        case 1:
-            return "bg-s-darker text-s-darker";
-            break;
-        case 2:
-            return "bg-s-dark text-s-dark";
-            break;
-        case 3:
-            return "bg-s text-s";
-            break;
-        case 4:
-            return "bg-p text-p";
-            break;
-        default:
-            break;
-    }
-}
-function getIconName(rate){
-    switch (rate) {
-        case 0:
-            return "em-white_circle";
-            break;
-        case 1:
-            return "em-face_vomiting";
-            break;
-        case 2:
-            return "em-shrug";
-            break;
-        case 3:
-            return "em-slightly_smiling_face";
-            break;
-        case 4:
-            return "em-heart_eyes";
-            break;
-        default:
-            break;
-    }
 }
 
 function clickOpenDetils(){
