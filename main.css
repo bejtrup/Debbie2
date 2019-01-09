@@ -1,5 +1,90 @@
+:root {
+    --bg: #000;
+    --p: hsl(20, 90%, 50%);
+    --p-s: hsl(20, 90%, 25%);
+    --s: hsl(0, 0%, 30%);
+    --s-s: hsl(0, 0%, 60%);
+    --s-dark: hsl(0, 0%, 20%);;
+    --s-dark-s: hsl(0, 0%, 40%);
+    --s-darker: hsl(0, 0%, 10%);
+    --s-darker-s: hsl(0, 0%, 30%);
+    --t : hsl(0, 0%, 100%);;
+    --t-s : hsl(0, 0%, 0%);
+
+    --text-p: #fff;
+  }
+body {
+    background-color: var( --bg);
+    color: var(--text-p);
+    text-transform: uppercase;
+    font-family: 'Titillium Web', sans-serif;
+}  
+
+.bg-p{
+    background-color: var(--p);
+}
+.bg-p-s{
+    background-color: var(--p-s);
+}
+.bg-s{
+    background-color: var(--s);
+}
+.bg-s-s{
+    background-color: var(--s)-s;
+}
+.bg-s-dark{
+    background-color: var(--s-dark);
+}
+.bg-s-dark-s{
+    background-color: var(--s-dark-s);
+}
+.bg-s-darker{
+    background-color: var(--s-darker);
+}
+.bg-s-darker-s{
+    background-color: var(--s-darker-s);
+}
+.bg-t{
+    background-color: var(--t);
+}
+.bg-t-s{
+    background-color: var(--t-s);
+}
+.bg-em{
+    /* background-color: rgba(0,0,0,.15); */
+}
+
+.text-p{
+    color: var(--p-s);
+}
+.text-s{
+    color: var(--s-s);
+}
+.text-s-dark{
+    color: var(--s-dark-s);
+}
+.text-s-darker{
+    color: var(--s-darker-s);
+}
+.text-t{
+    color: var(--t-s);
+}
 a{
-    color: tomato;
+    color: rgb(245, 209, 51);
+}
+h4{
+    font-weight: bold;
+}
+h5 {
+    font-size: 1rem;
+}
+
+.header{
+    position: fixed;
+    z-index: 10;
+    left: 1rem;
+    right: 1rem;
+    top: 0;
 }
 .detail {
     position: fixed;
@@ -13,6 +98,7 @@ a{
     left: 0;
     height: 100vh;
     overflow-y: auto;
+    z-index: 11;
 }
 .FilterToggle {
     width: 7rem;
@@ -129,4 +215,7 @@ a{
     width: 100%;
     background: #333;
     color: tomato;
+}
+.rounded {
+    border-radius: 30px;
 }

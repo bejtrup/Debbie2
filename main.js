@@ -7,6 +7,7 @@ const events = [
     {
         eventId: 0,
         eventName: "Roskilde",
+        eventColor: "#BADA55",
         event_db_url: "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/1/public/values?alt=json-in-script&callback=doData"
     },
     {
@@ -15,6 +16,8 @@ const events = [
         event_db_url: "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/2/public/values?alt=json-in-script&callback=doData"
     }
 ];
+
+//document.documentElement.style.setProperty('--your-variable', '#YOURCOLOR');
 
 window.onload = function(){
     getSettingsFromLS();
@@ -64,7 +67,7 @@ function makeBands() {
         if (cell.row > 1) {
             if(cell.col == "1"){
                 key = val;
-                bands[key] = {id: val};
+                bands[key] = {id: parseInt(val)};
             }
             if(cell.col == "2"){
                 bands[key].name = val;
@@ -109,6 +112,8 @@ function pushReatingToBands(){
       }
       // CL document.getElementById("cl").innerHTML = localStoragedReatings[0] +"::"+ localStoragedReatings[1] 
 }
+
+
 function setRating(_this, id, rating){
     _this.classList.add("active");
     for (let sibling of _this.parentNode.children) {
@@ -119,27 +124,39 @@ function setRating(_this, id, rating){
     var activeband = bands.find(band => band.id == id );
     activeband.rating = rating;
     if(appSettings[1].filterRatings[rating] == 1){
-        document.querySelector('.band[data-id="'+id+'"]').querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
+        var band_card = document.querySelector('.band[data-id="'+id+'"]');
+        band_card.style.display = 'block';
+        removeClassByPrefix(band_card.querySelector(".band-card"),"bg-")
+        band_card.querySelector(".band-card").className += " " + getColor(rating);
+        band_card.classList.remove()
+        band_card.querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
     } else {
-        var element = document.querySelector('.band[data-id="'+id+'"]')
-        element.parentNode.removeChild(element);
+        document.querySelector('.band[data-id="'+id+'"]').style.display = 'none';
     }
-
+    const bandDetail = document.querySelector('.detail');
+    bandDetail.className = "detail row p-3 " + getColor(rating);
 
     return false;
 }
+function removeClassByPrefix(el, prefix) {
+    var regx = new RegExp('\\b' + prefix + '(.*)?\\b', 'g');
+    el.className = el.className.replace(regx, '');
+    return el;
+}
+
 
 function makeBandlistHTML(){
     const bandCard_Small = 
     `${bands.map(band => `
         ${appSettings[1].filterRatings[band.rating] == 1 ? `
-        <div class="band row mb-3 duration-${band.duration}" data-id="${band.id}">
-            <div class="band-card col-12 bg-primary p-3 d-flex align-items-center">
-                <div class="mr-3">
+        <div class="band row mb-2 " data-id="${band.id}">
+            <div class="band-card col-12 p-3 d-flex align-items-center rounded ${getColor(band.rating)}">
+                <div class="mr-3 bg-em p-2 rounded-circle">
                         <i class="em-svg ${getIconName(band.rating)}"></i>      
                 </div>
                 <div>
                     <h4 class="m-0">${band.name}</h4>
+                    <h5 class="m-0" >${getStage(band.stage)} : Tirsdag d. 29 kl 19:00</h5>
                 </div>
             </div>
         </div>
@@ -147,28 +164,6 @@ function makeBandlistHTML(){
     `).join('')}`;
     document.getElementById("bandlist").innerHTML = bandCard_Small;
     clickOpenDetils();
-}
-
-function getIconName(rate){
-    switch (rate) {
-        case 0:
-            return "em-white_circle";
-            break;
-        case 1:
-            return "em-face_vomiting";
-            break;
-        case 2:
-            return "em-shrug";
-            break;
-        case 3:
-            return "em-slightly_smiling_face";
-            break;
-        case 4:
-            return "em-heart_eyes";
-            break;
-        default:
-            break;
-    }
 }
 
 function clickOpenDetils(){
@@ -179,6 +174,9 @@ function clickOpenDetils(){
     
     allbands.forEach((band) => {
       band.addEventListener('click', () => {
+        var b = bands.find(x => x.id == band.getAttribute('data-id'));
+        bandDetail.className = "detail row p-3 " + getColor(b.rating);
+
         const itemImage = band.querySelector('.band-card');
         bandDetail.setAttribute('data-id', band.getAttribute('data-id'));
         bandDetail.style.display = 'block';
@@ -289,11 +287,13 @@ function makeBandCardBig(activeBand){
     `
 }
 
+// KUN NEXT/PREV PÅ BANDS/RATINGS DER IKKE ER SKJULT
 
-// NEXT AND PREV NOT ON BANDS WIDT NOT SHOW RATING  OG NEXT/PREV EFTER RÆKKEFØLGE I BANDS
 
 function nextBand(bandId){
     const bandDetail = document.querySelector('.detail');
+    var b = bands.find(x => x.id == bandId+1);
+    bandDetail.className = "detail row p-3 " + getColor(b.rating);
     var slideOut = bandDetail.animate([
         {
           zIndex: 2,
@@ -354,6 +354,8 @@ function showNextDetailView(){
 
 function prevBand(bandId){
     const bandDetail = document.querySelector('.detail');
+    var b = bands.find(x => x.id == bandId-1);
+    bandDetail.className = "detail row p-3 " + getColor(b.rating);
     var slideOut = bandDetail.animate([
         {
           zIndex: 2,
@@ -430,3 +432,78 @@ function arraySort(property) {
 }
 
 //localStorage.clear();
+
+var isHeaderGone = false;
+var headerHeight;
+var selectorwrapper;
+var selectorwrapperHeight;
+var selectorwrapperOffset;
+var headerTramsisionEnd;
+window.addEventListener("load",function(){
+    headerHeight = document.getElementById("header").offsetHeight;
+    selectorwrapper = document.getElementById("headerSelector")
+    selectorwrapperHeight = selectorwrapper.offsetHeight;
+    selectorwrapperOffset = selectorwrapper.offsetTop;
+    headerTramsisionEnd = ((selectorwrapperHeight-headerHeight)/2)+selectorwrapperOffset;
+},false);
+
+document.addEventListener("scroll", function(e){
+    var scaleFactor = 1 - window.scrollY/headerTramsisionEnd;
+    if(scaleFactor >= 0 ){
+        selectorwrapper.style.transform = "scale("+scaleFactor+")";
+        selectorwrapper.style.opacity = scaleFactor;
+    }
+    if(window.scrollY > headerTramsisionEnd && !isHeaderGone){
+        selectorwrapper.style.opacity = 0;
+        showHeadline();
+        isHeaderGone = true;
+    }
+    if(window.scrollY < headerTramsisionEnd && isHeaderGone){
+        hideHeadline();
+        isHeaderGone = false;
+    }
+});
+function showHeadline(){
+    var headerHeadline = document.getElementById("headerHeadline");
+    headerHeadline.style.display = 'block';
+    var show = headerHeadline.animate([
+        {
+          transform: `
+            scale(0)
+          `
+        },
+        {
+          transform: `
+            scale(1)
+           `
+        }
+      ], {
+        duration: 200,
+        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        fill: "forwards"
+      });
+      var bgColor = getComputedStyle(document.body).getPropertyValue('--bg');
+      document.getElementById("header").style.background = bgColor;
+}
+function hideHeadline(){
+    var headerHeadline = document.getElementById("headerHeadline");
+    var hide = headerHeadline.animate([
+        {
+            transform: `
+            scale(1)
+            `
+        },
+        {
+            transform: `
+            scale(0)
+            `
+        }
+    ], {
+        duration: 200,
+        fill: "forwards"
+    });
+    hide.onfinish = function(){
+        headerHeadline.style.display = 'none';
+        document.getElementById("header").style.background = "none"
+    };
+}

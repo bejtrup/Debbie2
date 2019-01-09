@@ -3,7 +3,7 @@ function getSettingsFromLS() {
     if( localStorage.getItem("appSettings") ){
         appSettings = JSON.parse(localStorage.getItem("appSettings"));
       } else {
-        appSettings.push({eventSelected: 0}) 
+        appSettings.push({eventSelected: "0"}) 
         appSettings.push({filterRatings: [1,1,1,1,1]})
         appSettings.push({listSort: 0})
         localStorage.setItem('appSettings', JSON.stringify(appSettings));
@@ -19,7 +19,8 @@ function openSettings(){
             <select id="sortSelector" class="custom-select">
                     <option value="0" ${appSettings[2].listSort == 0 ? `selected` : ``}>Hovedenavne</option>
                     <option value="1" ${appSettings[2].listSort == 1 ? `selected` : ``}>A-Å</option>
-                    <option value="2" ${appSettings[2].listSort == 2 ? `selected` : ``}>Efter spilletidspunkt</option>
+                    <option value="2" ${appSettings[2].listSort == 2 ? `selected` : ``}>Spilletidspunkt</option>
+                    <option value="3" ${appSettings[2].listSort == 3 ? `selected` : ``}>Rating</option>
             </select>
         </div> 
         <h4 class="col-12 text-center mt-3">Vis:</h4>   
@@ -72,9 +73,13 @@ function SortBands(){
         case "1":
         bands.sort(arraySort("name"));
         break;
-        case "0":
+        case "2":
         // AND TIME
         bands.sort(arraySort("date"));
+        break;
+        case "3":
+        // AND TIME
+        bands.sort(arraySort("-rating"));
         break;
         
         default:
