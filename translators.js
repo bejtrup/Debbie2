@@ -42,7 +42,7 @@ function getIconName(rate){
             return "em-face_vomiting";
             break;
         case 2:
-            return "em-neutral_face";
+            return "em-no_mouth";
             break;
         case 3:
             return "em-slightly_smiling_face";

@@ -22,6 +22,7 @@ const events = [
 window.onload = function(){
     getSettingsFromLS();
     makeEventSelector();
+    makeSortmenu();
     getDB(events[appSettings[0].eventSelected].event_db_url);
 }
 
