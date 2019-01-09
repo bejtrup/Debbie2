@@ -7,6 +7,7 @@ const events = [
     {
         eventId: 0,
         eventName: "Roskilde",
+        eventColor: "#BADA55",
         event_db_url: "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/1/public/values?alt=json-in-script&callback=doData"
     },
     {
@@ -15,6 +16,8 @@ const events = [
         event_db_url: "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/2/public/values?alt=json-in-script&callback=doData"
     }
 ];
+
+//document.documentElement.style.setProperty('--your-variable', '#YOURCOLOR');
 
 window.onload = function(){
     getSettingsFromLS();
@@ -64,7 +67,7 @@ function makeBands() {
         if (cell.row > 1) {
             if(cell.col == "1"){
                 key = val;
-                bands[key] = {id: val};
+                bands[key] = {id: parseInt(val)};
             }
             if(cell.col == "2"){
                 bands[key].name = val;
@@ -153,7 +156,7 @@ function makeBandlistHTML(){
                 </div>
                 <div>
                     <h4 class="m-0">${band.name}</h4>
-                    <h5 class="m-0">${getStage(band.stage)} : Tirsdag d. 29 kl 19:00</h5>
+                    <h5 class="m-0" >${getStage(band.stage)} : Tirsdag d. 29 kl 19:00</h5>
                 </div>
             </div>
         </div>
@@ -429,3 +432,78 @@ function arraySort(property) {
 }
 
 //localStorage.clear();
+
+var isHeaderGone = false;
+var headerHeight;
+var selectorwrapper;
+var selectorwrapperHeight;
+var selectorwrapperOffset;
+var headerTramsisionEnd;
+window.addEventListener("load",function(){
+    headerHeight = document.getElementById("header").offsetHeight;
+    selectorwrapper = document.getElementById("headerSelector")
+    selectorwrapperHeight = selectorwrapper.offsetHeight;
+    selectorwrapperOffset = selectorwrapper.offsetTop;
+    headerTramsisionEnd = ((selectorwrapperHeight-headerHeight)/2)+selectorwrapperOffset;
+},false);
+
+document.addEventListener("scroll", function(e){
+    var scaleFactor = 1 - window.scrollY/headerTramsisionEnd;
+    if(scaleFactor >= 0 ){
+        selectorwrapper.style.transform = "scale("+scaleFactor+")";
+        selectorwrapper.style.opacity = scaleFactor;
+    }
+    if(window.scrollY > headerTramsisionEnd && !isHeaderGone){
+        selectorwrapper.style.opacity = 0;
+        showHeadline();
+        isHeaderGone = true;
+    }
+    if(window.scrollY < headerTramsisionEnd && isHeaderGone){
+        hideHeadline();
+        isHeaderGone = false;
+    }
+});
+function showHeadline(){
+    var headerHeadline = document.getElementById("headerHeadline");
+    headerHeadline.style.display = 'block';
+    var show = headerHeadline.animate([
+        {
+          transform: `
+            scale(0)
+          `
+        },
+        {
+          transform: `
+            scale(1)
+           `
+        }
+      ], {
+        duration: 200,
+        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        fill: "forwards"
+      });
+      var bgColor = getComputedStyle(document.body).getPropertyValue('--bg');
+      document.getElementById("header").style.background = bgColor;
+}
+function hideHeadline(){
+    var headerHeadline = document.getElementById("headerHeadline");
+    var hide = headerHeadline.animate([
+        {
+            transform: `
+            scale(1)
+            `
+        },
+        {
+            transform: `
+            scale(0)
+            `
+        }
+    ], {
+        duration: 200,
+        fill: "forwards"
+    });
+    hide.onfinish = function(){
+        headerHeadline.style.display = 'none';
+        document.getElementById("header").style.background = "none"
+    };
+}

@@ -13,11 +13,11 @@
 
     --text-p: #fff;
   }
-
 body {
     background-color: var( --bg);
     color: var(--text-p);
     text-transform: uppercase;
+    font-family: 'Titillium Web', sans-serif;
 }  
 
 .bg-p{
@@ -70,13 +70,23 @@ body {
     color: var(--t-s);
 }
 a{
-    color: tomato;
+    color: rgb(245, 209, 51);
 }
-
+h4{
+    font-weight: bold;
+}
 h5 {
     font-size: 1rem;
 }
 
+.header{
+    position: fixed;
+    z-index: 10;
+    left: 2rem;
+    right: 2rem;
+    top: 0;
+    background: red;
+}
 .detail {
     position: fixed;
     -webkit-transform-origin: top left;
@@ -89,6 +99,7 @@ h5 {
     left: 0;
     height: 100vh;
     overflow-y: auto;
+    z-index: 11;
 }
 .FilterToggle {
     width: 7rem;

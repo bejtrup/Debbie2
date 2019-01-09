@@ -1,12 +1,12 @@
 function getStage(stageID){
     const RoskildeFestivalStages = ['Orange','Arana','Pavilion','Pavilion Jr.','Apollo','Countdown','Avalon'];
-    
+    const CopenhellStages = ['Helvíti','Hades','Pandæmonium'];
     switch (appSettings[0].eventSelected) {
         case "0":
             return RoskildeFestivalStages[stageID];
             break;
         case "1":
-            return "Copenhell Secen";
+            return CopenhellStages[stageID];
             break;
         default:
             break;
@@ -42,7 +42,7 @@ function getIconName(rate){
             return "em-face_vomiting";
             break;
         case 2:
-            return "em-shrug";
+            return "em-neutral_face";
             break;
         case 3:
             return "em-slightly_smiling_face";
