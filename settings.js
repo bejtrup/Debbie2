@@ -3,26 +3,34 @@ function getSettingsFromLS() {
     if( localStorage.getItem("appSettings") ){
         appSettings = JSON.parse(localStorage.getItem("appSettings"));
       } else {
-        appSettings.push({eventSelected: "0"}) 
-        appSettings.push({filterRatings: [1,1,1,1,1]})
-        appSettings.push({listSort: 0})
+        appSettings.push({eventSelected: "0"});
+        appSettings.push({filterRatings: [1,1,1,1,1]});
+        appSettings.push({listSort: "0"});
         localStorage.setItem('appSettings', JSON.stringify(appSettings));
       }
 }
-
+    
+function makeSortmenu(){
+    const sortMenuHtml = `
+    <a href="" onclick="return toggleSort(this,'0');">
+        <i class="fas fa-star mx-3 ${appSettings[2].listSort != "0" ? `text-bg` : ``}"></i>
+    </a>
+    <a href="" onclick="return toggleSort(this,'1');">
+        <i class="fas fa-sort-alpha-down mx-3 ${appSettings[2].listSort != "1" ? `text-bg` : ``}"></i>
+    </a>
+    <a href="" onclick="return toggleSort(this,'2');">
+        <i class="fas fa-clock mx-3 ${appSettings[2].listSort != "2" ? `text-bg` : ``}"></i>
+    </a>
+    <a href="" onclick="return toggleSort(this,'3');">
+        <i class="fas fa-smile mx-3 ${appSettings[2].listSort != "3" ? `text-bg` : ``}"></i>
+    </a>  
+    `;
+    document.getElementById("sortmenu").innerHTML = sortMenuHtml;
+}
 
 function openSettings(){
     const settingsMenuHTML = `
         <div class="row mx-0 p-3">
-        <div class="col-12 d-flex align-items-center justify-content-center">
-            <h4 class="pr-3">Sotér</h4>   
-            <select id="sortSelector" class="custom-select">
-                    <option value="0" ${appSettings[2].listSort == 0 ? `selected` : ``}>Hovedenavne</option>
-                    <option value="1" ${appSettings[2].listSort == 1 ? `selected` : ``}>A-Å</option>
-                    <option value="2" ${appSettings[2].listSort == 2 ? `selected` : ``}>Spilletidspunkt</option>
-                    <option value="3" ${appSettings[2].listSort == 3 ? `selected` : ``}>Rating</option>
-            </select>
-        </div> 
         <h4 class="col-12 text-center mt-3">Vis:</h4>   
         ${appSettings[1].filterRatings.map(function(filterRating, key){ return`
             <div class="col-12 p-3 d-flex justify-content-center">
@@ -56,16 +64,25 @@ function toggleFilterRating(_this, filterRatingId){
 
 function SubmitSettings(){
     document.getElementById("bandlist").innerHTML = "henter bands...";
-    
-    appSettings[2].listSort = document.getElementById("sortSelector").value;
-    localStorage.setItem('appSettings', JSON.stringify(appSettings));
-    SortBands();
-
     document.getElementById("settingsMenu").innerHTML = '';
     makeBandlistHTML();
 }
 
+function toggleSort(_this, sortValue){
+    _this.querySelector("svg").classList.remove("text-bg");
+    for (let sibling of _this.parentNode.children) {
+        if (sibling !== _this) sibling.querySelector("svg").classList.add('text-bg');
+    }
+    appSettings[2].listSort = sortValue;
+    localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    document.getElementById("bandlist").innerHTML = "henter bands...";
+    SortBands();
+    makeBandlistHTML();
+    return false;
+}
+
 function SortBands(){
+
     switch (appSettings[2].listSort) {
         case "0":
         bands.sort(arraySort("id"));

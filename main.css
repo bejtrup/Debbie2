@@ -1,17 +1,17 @@
 :root {
-    --bg: #000;
-    --p: hsl(20, 90%, 50%);
-    --p-s: hsl(20, 90%, 25%);
-    --s: hsl(0, 0%, 30%);
-    --s-s: hsl(0, 0%, 60%);
-    --s-dark: hsl(0, 0%, 20%);;
-    --s-dark-s: hsl(0, 0%, 40%);
-    --s-darker: hsl(0, 0%, 10%);
-    --s-darker-s: hsl(0, 0%, 30%);
-    --t : hsl(0, 0%, 100%);;
-    --t-s : hsl(0, 0%, 0%);
-
-    --text-p: #fff;
+    --bg: #10153F;
+    --p: hsl(17, 86%, 60%);
+    --p-s: hsl(17, 86%, 30%);
+    --s: hsl(245, 42%, 36%);
+    --s-s: hsl(245, 42%, 10%);
+    --s-dark: hsl(245, 56%, 27%);
+    --s-dark-s: hsl(245, 56%, 10%);
+    --s-darker: hsl(232, 61%, 20%);
+    --s-darker-s: hsl(232, 61%, 5%);
+    --t : hsl(229, 94%, 79%);
+    --t-s : hsl(229, 94%, 10%);
+    --a: rgb(245, 209, 51);
+    --text-p: #9EABEA;
   }
 body {
     background-color: var( --bg);
@@ -53,7 +53,14 @@ body {
 .bg-em{
     /* background-color: rgba(0,0,0,.15); */
 }
+select{
+    background-color: var(--t)!important;
+    color: var(--t-s)!important;
+}
 
+.text-p-p{
+    color: var(--p);
+}
 .text-p{
     color: var(--p-s);
 }
@@ -69,8 +76,11 @@ body {
 .text-t{
     color: var(--t-s);
 }
-a{
-    color: rgb(245, 209, 51);
+.text-bg {
+    color: var(--text-p);
+}
+a, a:hover, a:active, a:focus{
+    color: var(--a);
 }
 h4{
     font-weight: bold;
@@ -90,6 +100,7 @@ h5 {
     position: fixed;
     -webkit-transform-origin: top left;
     transform-origin: top left;
+    z-index: 12;
 }
 .settingsMenu {
     position: fixed;
