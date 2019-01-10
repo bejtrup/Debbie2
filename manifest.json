@@ -3,7 +3,7 @@
     "lang" : "dk",
     "name" : "Debbie - styr på musikprogrammet",
     "scope" : "/",
-    "display" : "fullscreen",
+    "display" : "standalone",
     "start_url" : "https://bejtrup.github.io/Debbie2/",
     "short_name" : "Debbie",
     "theme_color" : "#6cc8c2",
