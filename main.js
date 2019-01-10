@@ -438,16 +438,18 @@ var selectorwrapperHeight;
 var selectorwrapperOffset;
 var headerTramsisionEnd;
 window.addEventListener("load",function(){
+    var eventSelected = parseInt( appSettings[0].eventSelected );
+    this.document.getElementById('eventSelectedName').innerHTML = events[eventSelected].eventName;
+
     headerHeight = document.getElementById("header").offsetHeight;
     selectorwrapper = document.getElementById("headerSelector")
     selectorwrapperHeight = selectorwrapper.offsetHeight;
     selectorwrapperOffset = selectorwrapper.offsetTop;
     headerTramsisionEnd = ((selectorwrapperHeight-headerHeight)/2)+selectorwrapperOffset;
+
 },false);
 
 document.addEventListener("scroll", function(e){
-    console.log(window.scrollY)
-
     var scaleFactor = 1 - window.scrollY/headerTramsisionEnd;
     if(scaleFactor >= 0 ){
         selectorwrapper.style.transform = "scale("+scaleFactor+")";
@@ -472,8 +474,6 @@ document.addEventListener("touchend", function(e){
     else if (scroll > headerHeight && scroll < (selectorwrapperHeight + selectorwrapperOffset - headerHeight)){
         window.scroll({top: (selectorwrapperHeight + selectorwrapperOffset - headerHeight), left: 0, behavior: 'smooth' });
     }
-    console.log("nu");
-
 });
 
 function showHeadline(){
