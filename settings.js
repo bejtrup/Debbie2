@@ -85,7 +85,8 @@ function SortBands(){
 
     switch (appSettings[2].listSort) {
         case "0":
-        bands.sort(arraySort("id"));
+        bands.sort(arraySort("name"));
+        bands.sort(arraySort("HeadlineScore"));
         break;
         case "1":
         bands.sort(arraySort("name"));

@@ -72,20 +72,23 @@ function makeBands() {
             }
             if(cell.col == "2"){
                 bands[key].name = val;
-            }
+            } 
             if(cell.col == "3"){
-                bands[key].date = val;
+                bands[key].HeadlineScore = parseInt(val);
             }
             if(cell.col == "4"){
-                bands[key].time = val;
+                bands[key].date = val;
             }
             if(cell.col == "5"){
-                bands[key].duration = val;
+                bands[key].time = val;
             }
             if(cell.col == "6"){
-                bands[key].stage = val.split("_")[0];
+                bands[key].duration = parseInt(val);
             }
             if(cell.col == "7"){
+                bands[key].stage = val.split("_")[0];
+            }
+            if(cell.col == "8"){
                 bands[key].iframe = val;
             }
         }
@@ -413,12 +416,6 @@ function showPrevDetailView(){
       };
     return false;
 }
-/*
-        <div class="d-flex mt-3">
-            <i class="em-svg em-memo mr-2"></i>
-            <a href="">${bands[id].note != "" ? bands[id].note : "Tilføj en note"}</a>
-        </div>
-*/
 
 function arraySort(property) {
     var sortOrder = 1;
@@ -449,6 +446,8 @@ window.addEventListener("load",function(){
 },false);
 
 document.addEventListener("scroll", function(e){
+    console.log(window.scrollY)
+
     var scaleFactor = 1 - window.scrollY/headerTramsisionEnd;
     if(scaleFactor >= 0 ){
         selectorwrapper.style.transform = "scale("+scaleFactor+")";
@@ -464,6 +463,19 @@ document.addEventListener("scroll", function(e){
         isHeaderGone = false;
     }
 });
+
+document.addEventListener("touchend", function(e){
+    var scroll = window.scrollY;
+    if(scroll > 0 && scroll <= headerHeight ){
+        window.scroll({top: 0, left: 0, behavior: 'smooth' });
+    }
+    else if (scroll > headerHeight && scroll < (selectorwrapperHeight + selectorwrapperOffset - headerHeight)){
+        window.scroll({top: (selectorwrapperHeight + selectorwrapperOffset - headerHeight), left: 0, behavior: 'smooth' });
+    }
+    console.log("nu");
+
+});
+
 function showHeadline(){
     var headerHeadline = document.getElementById("headerHeadline");
     headerHeadline.style.display = 'block';
