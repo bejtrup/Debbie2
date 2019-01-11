@@ -26,28 +26,28 @@
 
 </head>
 <body>
-    <div class="container pt-5">
+    <div id='container' class="container pt-5 mx-0">
         <div id="header" class="header row justify-content-between align-items-center px-3 py-4">
-                <div class=""><i class="far fa-question-circle text-bg"></i></div>
+                <div class="">
+                    <!-- <i class="far fa-question-circle text-bg"></i> -->
+                </div>
                 <div id="headerHeadline" class="text center" style="display: none;">
                     <h5 id='eventSelectedName' class="m-0" onclick="window.scroll({top: 0, left: 0, behavior: 'smooth' });"></h5>
                 </div>
                 <div class="">
-                    <a href="" onclick="return openSettings();"><i class="fas fa-toggle-on text-bg"></i></a>               
+                    <a href="" onclick="return showSettings();"><i class="fas fa-toggle-on text-bg"></i></a>               
                 </div>
         </div>
         <div id="headerSelector" class="row pt-5 pb-2">
-            <div class="col-12 d-flex justify-content-center">
+            <div class="col-12 d-flex justify-content-center align-items-center">
                 <i class="em-svg em-musical_note mr-3 em-xl"></i>
                 <span id="eventSelectorWrapper" style="min-width: 195px;"></span>
             </div>
             <div id="sortmenu" class="col-12 d-flex pt-3 mt-3 justify-content-center"></div>
         </div>
         <div id="bandlist" class="p-3"></div>
-        <!-- <button class="btn btn-danger" onclick="localStorage.clear(); location.reload();">slet alt</button> -->
         <div class="detail row p-3" data-id="" style="display: none;"></div>
-        <div id="settingsMenu" class="settingsMenu pb-5"></div>
-        <!-- <div id="cl" class="cl"></div> -->
     </div>
+    <div id="settingsMenu" class="settingsMenu pb-5"></div>
 </body>
 </html>

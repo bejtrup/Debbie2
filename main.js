@@ -152,8 +152,7 @@ function removeClassByPrefix(el, prefix) {
 function makeBandlistHTML(){
     const bandCard_Small = 
     `${bands.map(band => `
-        ${appSettings[1].filterRatings[band.rating] == 1 ? `
-        <div class="band row mb-2 " data-id="${band.id}">
+        <div class="band row mb-2 " data-id="${band.id}" data-filterRatingId="${(band.rating)}" style="${appSettings[1].filterRatings[band.rating] == 1 ? `` : `display: none`}">
             <div class="band-card col-12 p-3 d-flex align-items-center rounded ${getColor(band.rating)}">
                 <div class="mr-3 bg-em p-2 rounded-circle">
                         <i class="em-svg ${getIconName(band.rating)}"></i>      
@@ -163,8 +162,7 @@ function makeBandlistHTML(){
                     <h5 class="m-0" >${getStage(band.stage)} : Tirsdag d. 29 kl 19:00</h5>
                 </div>
             </div>
-        </div>
-    `: ``}    
+        </div>   
     `).join('')}`;
     document.getElementById("bandlist").innerHTML = bandCard_Small;
     clickOpenDetils();
@@ -472,7 +470,7 @@ document.addEventListener("touchend", function(e){
         window.scroll({top: 0, left: 0, behavior: 'smooth' });
     }
     else if (scroll > headerHeight && scroll < (selectorwrapperHeight + selectorwrapperOffset - headerHeight)){
-        window.scroll({top: (selectorwrapperHeight + selectorwrapperOffset - headerHeight), left: 0, behavior: 'smooth' });
+        window.scroll({top: (selectorwrapperHeight + selectorwrapperOffset - headerHeight) + 16, left: 0, behavior: 'smooth' });
     }
 });
 
