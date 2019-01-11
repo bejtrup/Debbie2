@@ -104,29 +104,35 @@ h5 {
 }
 .settingsMenu {
     position: fixed;
-    background: tomato;
+    display: none;
+    background: var(--s);
     top: 0;
-    left: 0;
+    right: 0;
+    width: 25vw;
     height: 100vh;
     overflow-y: auto;
     z-index: 11;
 }
 .FilterToggle {
-    width: 7rem;
-    border-radius: 3rem;
+    min-width: 14vw;
+    max-width: 14vw;
+    border-radius: 10vw;
     transition: 0.4s;
 }
 .FilterToggle .em-svg{
+    max-width: 6vw;
+    max-height: 6vw;
     transition: 0.4s;
 }
 .FilterToggle.on {
-    background: red;
+    background: var(--p);
 }
 .FilterToggle.on .em-svg{
-    transform: translateX(3.5rem);
+    /* transform: translateX(6vw); */
+    float: right;
 }
 .FilterToggle.off {
-    background: #333;   
+    background: var(--s-darker);
 }
 .FilterToggle.off .em-svg{
     transform: translateX(0);
@@ -212,6 +218,10 @@ h5 {
 }
 
 /* BOOTSTRAP HACKS*/
+.container {
+    min-height: 150vh;
+}
+
 .custom-select-lg {
     height: 58px;
     padding-top: .375rem;
