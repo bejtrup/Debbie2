@@ -190,8 +190,19 @@ function toggleSort(_this, sortValue){
     return false;
 }
 
-function SortBands(){
+function arraySort(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
 
+function SortBands(){
     switch (appSettings[2].listSort) {
         case "0":
         bands.sort(arraySort("name"));

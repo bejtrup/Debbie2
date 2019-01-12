@@ -118,12 +118,13 @@ function pushReatingToBands(){
 }
 
 function setRating(_this, id, rating){
-    _this.classList.add("active");
+    _this.classList.add("activeRating");
     for (let sibling of _this.parentNode.children) {
-        if (sibling !== _this) sibling.classList.remove('active');
+        if (sibling !== _this) sibling.classList.remove('activeRating');
     }
     localStoragedReatings[appSettings[0].eventSelected][id] = rating;
     localStorage.setItem('localStoragedReatings', JSON.stringify(localStoragedReatings));
+    
     var activeband = bands.find(band => band.id == id );
     activeband.rating = rating;
     
@@ -137,8 +138,9 @@ function setRating(_this, id, rating){
     if(appSettings[1].filterRatings[rating] == 0){
         band_card.style.display = 'none';
     }
-    const bandDetail = document.querySelector('.detail');
-    bandDetail.className = "detail row p-3 " + getColor(rating);
+    const bandDetail_Child = document.querySelector('.detail.active .col-12');
+    removeClassByPrefix(bandDetail_Child,"bg-");
+    bandDetail_Child.className += " " + getColor(rating);
 
     return false;
 }
@@ -168,25 +170,29 @@ function makeBandlistHTML(){
 }
 
 function clickOpenDetils(){
-    const allbands = document.querySelectorAll('.band');
+    const allbandElements = document.querySelectorAll('.band');
     const bandDetail = document.querySelector('.detailWrapper');
     bandDetail.style.display = 'none';
     
-    allbands.forEach((band) => {
-      band.addEventListener('click', () => {
-        var b = bands.find(x => x.id == band.getAttribute('data-id'));
+    allbandElements.forEach((bandElem) => {
+        bandElem.addEventListener('click', () => {
+        var band = bands.find(x => x.id == bandElem.getAttribute('data-id'));
 
-        bandDetail.querySelector('.detail').className = "detail row p-3 " + getColor(b.rating);
+        //bandDetail.querySelector('.detail').className = "detail row p-3 " + getColor(b.rating);
 
-        const itemImage = band.querySelector('.band-card');
-        bandDetail.setAttribute('data-id', band.getAttribute('data-id'));
+        const band_card = bandElem.querySelector('.band-card');
+        
+        bandDetail.setAttribute('data-id', band.id);
         bandDetail.style.display = 'block';
+        
+        makeDetailView();
+
         var wh = bandDetail.offsetHeight;
         var dwh = bandDetail.scrollHeight
         bandDetail.scroll({top:(dwh-wh)/2 + 16 });
-        band.style.opacity = 0;
         
-        let firstRect = itemImage.getBoundingClientRect();
+        
+        let firstRect = band_card .getBoundingClientRect();
         let lastRect = bandDetail.getBoundingClientRect();
         
         var openDetail = bandDetail.animate([
@@ -213,52 +219,10 @@ function clickOpenDetils(){
         });
 
         openDetail.onfinish = function(){
-            makeDetailView();
-        };
+             makeDetailViewActiveElm();
+         };
       });
     });
-}
-
-function clickCloseDetils(){
-        const bandDetail = document.querySelector('.detailWrapper');
-        const itemImage = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
-        
-        let itemImageRect = itemImage.getBoundingClientRect();
-        let detailItemRect = bandDetail.getBoundingClientRect();
-      
-        bandDetail.style.display = 'none';
-        itemImage.style.opacity = 1;
-        
-        var closeDetail = itemImage.animate([
-            {
-              zIndex: 2,
-              transform: `
-                translateX(${detailItemRect.left - itemImageRect.left}px)
-                translateY(${detailItemRect.top - itemImageRect.top}px)
-                scaleX(${detailItemRect.width / itemImageRect.width})
-                scaleY(${detailItemRect.height / itemImageRect.height})
-              `
-            },
-            {
-              zIndex: 2,
-              transform: `
-                translateX(0)
-                translateY(0)
-                scaleX(1)
-                scaleY(1)
-               `
-            }
-          ], {
-            duration: 300,
-            easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
-          });
-  
-          closeDetail.onfinish = function(){
-            bandDetail.querySelector('.detail').innerHTML = '';
-            bandDetail.querySelector('.detail_prev').innerHTML = '';
-            bandDetail.querySelector('.detail_next').innerHTML = '';
-          };
-     
 }
 
 function makeDetailView(){
@@ -268,8 +232,7 @@ function makeDetailView(){
         return band.id == document.querySelector('.detailWrapper').getAttribute('data-id')
     });
 
-    document.querySelector('.detail').innerHTML = makeBandDetailsHTML(band);
-
+    document.querySelector('.detail.active').innerHTML = makeBandDetailsHTML(band);
     
     var next_band = bands.find(function(band,key){
         return key > activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
@@ -281,40 +244,69 @@ function makeDetailView(){
     });
 
     if(next_band){
-        document.querySelector('.detail_next').innerHTML = makeBandDetailsPrevNextHTML(next_band);  
+        document.querySelector('.detail.next').innerHTML = makeBandDetailsHTML(next_band);  
     }
     if(prev_band){
-        document.querySelector('.detail_prev').innerHTML = makeBandDetailsPrevNextHTML(prev_band);
+        document.querySelector('.detail.prev').innerHTML = makeBandDetailsHTML(prev_band);
     }
-    // CHECK PÅ UNDEFIND
 
 
-    // if(activeBandKey > 0){
-        
-    // }
+}
+
+function makeDetailViewActiveElm(){
+
+    // MAKE CLOSE IFREAM VOTEBTN - SLET DE ANDRE
+
+}
+
+function clickCloseDetils(){
+    const bandDetail = document.querySelector('.detailWrapper');
+    const activeDetails = document.querySelector('.detail.active');
+    const band_card = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
     
-    // if(activeBandKey > 0 && appSettings[1].filterRatings[bands[activeBandKey-1].rating] != 0 ){
-    // }
+    let band_cardRect = band_card.getBoundingClientRect();
+    let activeDetailsRect = activeDetails.getBoundingClientRect();
+  
+    bandDetail.style.display = 'none';
 
-    // // CHECK PÅ DET IKKE ER SIDSTE
-    // if(true && appSettings[1].filterRatings[bands[activeBandKey-1].rating] != 0 ){
-    // }
+    var closeDetail = band_card.animate([
+        {
+          zIndex: 20,
+          transform: `
+            translateX(${activeDetailsRect.left - band_cardRect.left}px)
+            translateY(${activeDetailsRect.top/2}px)
+            scaleX(${activeDetailsRect.width / band_cardRect.width})
+            scaleY(${activeDetailsRect.height / band_cardRect.height})
+          `
+        },
+        {
+          zIndex: 2,
+          transform: `
+            translateX(0)
+            translateY(0)
+            scaleX(1)
+            scaleY(1)
+           `
+        }
+      ], {
+        duration: 300,
+        easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
+      });
 
-    document.querySelector('.close-details').addEventListener('click', (e) => {
-        e.preventDefault();
-        clickCloseDetils();
-    });
+      closeDetail.onfinish = function(){
+        bandDetail.querySelectorAll('.detail').innerHTML = '';
+      };
+      return false;
 }
 
 function makeBandDetailsHTML(activeBand){
     return`
-    <div class="col-12 d-flex flex-column h-100">
+    <div class="col-12 p-3 d-flex flex-column ${getColor(activeBand.rating)}">
         <div class="d-flex justify-content-between">
             <h1>${activeBand.name}</h1>
-            <a class="close-details" href=""><i class="em em-x"></i></a>
+            <a class="close-details" onclick="return clickCloseDetils();" href=""><i class="em em-x"></i></a>
         </div>
-        <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
-        <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
+        
         <div class="ratebar mt-auto d-flex justify-content-around py-3">
             <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `active` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
             <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `active` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
@@ -325,15 +317,14 @@ function makeBandDetailsHTML(activeBand){
     `
 }
 
-function makeBandDetailsPrevNextHTML(activeBand){
-    return`
-    <div class="col-12 d-flex flex-column h-100">
-        <div class="d-flex justify-content-between">
-            <h4>${activeBand.name}</h4>
-        </div>
-    </div>
-    `
-}
+//<div class="iframeContainer bg-loading">${activeBand.iframe}</div>
+//<div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
+
+
+
+
+
+
 
 
 // KUN NEXT/PREV PÅ BANDS/RATINGS DER IKKE ER SKJULT
@@ -361,140 +352,130 @@ function makeBandDetailsPrevNextHTML(activeBand){
 
 // }, false) // end window.onload
 
-function nextBand(bandId){
-    const bandDetail = document.querySelector('.detail');
-    var b = bands.find(x => x.id == bandId+1);
-    bandDetail.className = "detail row p-3 " + getColor(b.rating);
-    var slideOut = bandDetail.animate([
-        {
-          zIndex: 2,
-          transform: `
-            translateY(0)
-          `
-        },
-        {
-          zIndex: 2,
-          transform: `
-            translateY(-100%)
-           `
-        }
-      ], {
-        duration: 300,
-        easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
-      });
+// function nextBand(bandId){
+//     const bandDetail = document.querySelector('.detail');
+//     var b = bands.find(x => x.id == bandId+1);
+//     bandDetail.className = "detail row p-3 " + getColor(b.rating);
+//     var slideOut = bandDetail.animate([
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(0)
+//           `
+//         },
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(-100%)
+//            `
+//         }
+//       ], {
+//         duration: 300,
+//         easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
+//       });
 
-      slideOut.onfinish = function(){
-        const itemImage = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
-        itemImage.style.opacity = 1;
-        bandDetail.innerHTML = '';
-        bandDetail.style.display = 'none';
+//       slideOut.onfinish = function(){
+//         const itemImage = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
+//         itemImage.style.opacity = 1;
+//         bandDetail.innerHTML = '';
+//         bandDetail.style.display = 'none';
           
-        var activeBand_index = bands.findIndex(band => band.id == bandId);
-        bandDetail.setAttribute('data-id', bands[activeBand_index + 1].id);
-        makeDetailView();
-        showNextDetailView();
-      };
-    return false;
-}
-function showNextDetailView(){
-    const bandDetail = document.querySelector('.detail');
-    bandDetail.style.display = 'block';
-    var slideIn = bandDetail.animate([
-        {
-          zIndex: 2,
-          transform: `
-            translateY(100%)
-          `
-        },
-        {
-          zIndex: 2,
-          transform: `
-            translateY(0)
-           `
-        }
-      ], {
-        duration: 300,
-        easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
-      });
+//         var activeBand_index = bands.findIndex(band => band.id == bandId);
+//         bandDetail.setAttribute('data-id', bands[activeBand_index + 1].id);
+//         makeDetailView();
+//         showNextDetailView();
+//       };
+//     return false;
+// }
+// function showNextDetailView(){
+//     const bandDetail = document.querySelector('.detail');
+//     bandDetail.style.display = 'block';
+//     var slideIn = bandDetail.animate([
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(100%)
+//           `
+//         },
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(0)
+//            `
+//         }
+//       ], {
+//         duration: 300,
+//         easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
+//       });
 
-      slideIn.onfinish = function(){
+//       slideIn.onfinish = function(){
 
-      };
-    return false;
-}
+//       };
+//     return false;
+// }
 
-function prevBand(bandId){
-    const bandDetail = document.querySelector('.detail');
-    var b = bands.find(x => x.id == bandId-1);
-    bandDetail.className = "detail row p-3 " + getColor(b.rating);
-    var slideOut = bandDetail.animate([
-        {
-          zIndex: 2,
-          transform: `
-            translateY(0)
-          `
-        },
-        {
-          zIndex: 2,
-          transform: `
-            translateY(100%)
-           `
-        }
-      ], {
-        duration: 300,
-        easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
-      });
+// function prevBand(bandId){
+//     const bandDetail = document.querySelector('.detail');
+//     var b = bands.find(x => x.id == bandId-1);
+//     bandDetail.className = "detail row p-3 " + getColor(b.rating);
+//     var slideOut = bandDetail.animate([
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(0)
+//           `
+//         },
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(100%)
+//            `
+//         }
+//       ], {
+//         duration: 300,
+//         easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
+//       });
 
-      slideOut.onfinish = function(){
-        const itemImage = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
-        itemImage.style.opacity = 1;
-        bandDetail.innerHTML = '';
-        bandDetail.style.display = 'none';
-        var activeBand_index = bands.findIndex(band => band.id == bandId);
-        bandDetail.setAttribute('data-id', bands[activeBand_index - 1 ].id);
-        makeDetailView();
-        showPrevDetailView();
-      };
-    return false;
-}
-function showPrevDetailView(){
-    const bandDetail = document.querySelector('.detail');
-    bandDetail.style.display = 'block';
-    var slideIn = bandDetail.animate([
-        {
-          zIndex: 2,
-          transform: `
-            translateY(-100%)
-          `
-        },
-        {
-          zIndex: 2,
-          transform: `
-            translateY(0)
-           `
-        }
-      ], {
-        duration: 300,
-        easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
-      });
+//       slideOut.onfinish = function(){
+//         const itemImage = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
+//         itemImage.style.opacity = 1;
+//         bandDetail.innerHTML = '';
+//         bandDetail.style.display = 'none';
+//         var activeBand_index = bands.findIndex(band => band.id == bandId);
+//         bandDetail.setAttribute('data-id', bands[activeBand_index - 1 ].id);
+//         makeDetailView();
+//         showPrevDetailView();
+//       };
+//     return false;
+// }
+// function showPrevDetailView(){
+//     const bandDetail = document.querySelector('.detail');
+//     bandDetail.style.display = 'block';
+//     var slideIn = bandDetail.animate([
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(-100%)
+//           `
+//         },
+//         {
+//           zIndex: 2,
+//           transform: `
+//             translateY(0)
+//            `
+//         }
+//       ], {
+//         duration: 300,
+//         easing: 'cubic-bezier(0.2, 0, 0.2, 1)',
+//       });
 
-      slideIn.onfinish = function(){
+//       slideIn.onfinish = function(){
 
-      };
-    return false;
-}
+//       };
+//     return false;
+// }
 
-function arraySort(property) {
-    var sortOrder = 1;
-    if(property[0] === "-") {
-        sortOrder = -1;
-        property = property.substr(1);
-    }
-    return function (a,b) {
-        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-        return result * sortOrder;
-    }
-}
+
 
 //localStorage.clear();
 

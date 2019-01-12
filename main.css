@@ -97,6 +97,10 @@ h5 {
     right: 1rem;
     top: 0;
 }
+.band-card{
+    -webkit-transform-origin: top;
+    transform-origin: top;
+}
 .detailWrapper {
     position: fixed;
     -webkit-transform-origin: top left;
@@ -105,19 +109,21 @@ h5 {
     background: var(--bg);
     overflow: auto;
     z-index: 12;
+
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+
+    scroll-snap-type: y mandatory;
+    scroll-padding: 10vh;
 }
 .detail {
     min-height: 80vh;
+    scroll-snap-align: start;
+}
+.detail.col-12 {
     border-radius: 30px;
 }
-.detail_prev {
-    min-height: 15vh;
-    margin-bottom: 5vh;
-}
-.detail_next {
-    min-height: 15vh;
-    margin-top: 5vh;
-}
+
 .settingsMenu {
     position: fixed;
     display: none;
@@ -194,7 +200,7 @@ h5 {
     }
 }
 
-.active{
+.activeRating{
     transform: scale(1.5);
 }
 
