@@ -110,17 +110,18 @@ h5 {
     overflow: auto;
     z-index: 12;
 
-    padding-top: 10vh;
-    padding-bottom: 10vh;
+    padding-top: 20vh;
+    padding-bottom: 20vh;
 
     scroll-snap-type: y mandatory;
-    scroll-padding: 10vh;
+    scroll-padding: 7vh;
 }
 .detail {
     min-height: 80vh;
+    max-height: 80vh;
     scroll-snap-align: start;
 }
-.detail.col-12 {
+.detail .col-12 {
     border-radius: 30px;
 }
 
@@ -205,8 +206,9 @@ h5 {
 }
 
 .iframeContainer{
-    height: 60vh;
-    max-height: 450px;
+    height: 50vh;
+    max-height: 50vh;
+    overflow: scroll;
 }
  
 .ratebar .em-svg, .em-xl, .FilterToggle .em-svg{
@@ -263,4 +265,16 @@ h5 {
 }
 .rounded {
     border-radius: 30px;
+}
+.fa-spin {
+    animation: fa-spin 2s infinite linear
+}
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    to {
+        transform: rotate(1turn)
+    }
 }
