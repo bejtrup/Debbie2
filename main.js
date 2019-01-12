@@ -114,9 +114,7 @@ function pushReatingToBands(){
         });
         band.rating = localStoragedReatings[appSettings[0].eventSelected][index] ? localStoragedReatings[appSettings[0].eventSelected][index] : 0;          
       }
-      // CL document.getElementById("cl").innerHTML = localStoragedReatings[0] +"::"+ localStoragedReatings[1] 
 }
-
 
 function setRating(_this, id, rating){
     _this.classList.add("active");
@@ -127,15 +125,16 @@ function setRating(_this, id, rating){
     localStorage.setItem('localStoragedReatings', JSON.stringify(localStoragedReatings));
     var activeband = bands.find(band => band.id == id );
     activeband.rating = rating;
-    if(appSettings[1].filterRatings[rating] == 1){
-        var band_card = document.querySelector('.band[data-id="'+id+'"]');
-        band_card.style.display = 'block';
-        removeClassByPrefix(band_card.querySelector(".band-card"),"bg-")
-        band_card.querySelector(".band-card").className += " " + getColor(rating);
-        band_card.classList.remove()
-        band_card.querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
-    } else {
-        document.querySelector('.band[data-id="'+id+'"]').style.display = 'none';
+    
+    var band_card = document.querySelector('.band[data-id="'+id+'"]');
+    band_card.style.display = 'block';   
+    band_card.dataset.filterratingid = rating.toString();
+    removeClassByPrefix(band_card.querySelector(".band-card"),"bg-")
+    band_card.querySelector(".band-card").className += " " + getColor(rating);
+    band_card.classList.remove()
+    band_card.querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
+    if(appSettings[1].filterRatings[rating] == 0){
+        band_card.style.display = 'none';
     }
     const bandDetail = document.querySelector('.detail');
     bandDetail.className = "detail row p-3 " + getColor(rating);
