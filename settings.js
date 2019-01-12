@@ -49,7 +49,7 @@ function showSettings(){
         settingsMenu.innerHTML = settingsMenuHTML;
     
     } 
-    var container = document.getElementById("container");
+    
     settingsMenu.style.display = "block";
     var showSettingsMenu = settingsMenu.animate([
         {
