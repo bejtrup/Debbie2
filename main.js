@@ -105,7 +105,7 @@ function pushReatingToBands(){
       } else {
           for (let index = 0; index < events.length; index++) {
             localStoragedReatings.push([]);
-              
+
           }
         localStorage.setItem('localStoragedReatings', JSON.stringify(localStoragedReatings));
       }
@@ -169,18 +169,21 @@ function makeBandlistHTML(){
 
 function clickOpenDetils(){
     const allbands = document.querySelectorAll('.band');
-    const bandDetail = document.querySelector('.detail');
-    
+    const bandDetail = document.querySelector('.detailWrapper');
     bandDetail.style.display = 'none';
     
     allbands.forEach((band) => {
       band.addEventListener('click', () => {
         var b = bands.find(x => x.id == band.getAttribute('data-id'));
-        bandDetail.className = "detail row p-3 " + getColor(b.rating);
+
+        bandDetail.querySelector('.detail').className = "detail row p-3 " + getColor(b.rating);
 
         const itemImage = band.querySelector('.band-card');
         bandDetail.setAttribute('data-id', band.getAttribute('data-id'));
         bandDetail.style.display = 'block';
+        var wh = bandDetail.offsetHeight;
+        var dwh = bandDetail.scrollHeight
+        bandDetail.scroll({top:(dwh-wh)/2 + 16 });
         band.style.opacity = 0;
         
         let firstRect = itemImage.getBoundingClientRect();
@@ -205,7 +208,7 @@ function clickOpenDetils(){
              `
           }
          ], {
-          duration: 300,
+          duration: 200,
           easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
         });
 
@@ -217,7 +220,7 @@ function clickOpenDetils(){
 }
 
 function clickCloseDetils(){
-        const bandDetail = document.querySelector('.detail');
+        const bandDetail = document.querySelector('.detailWrapper');
         const itemImage = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
         
         let itemImageRect = itemImage.getBoundingClientRect();
@@ -251,21 +254,59 @@ function clickCloseDetils(){
           });
   
           closeDetail.onfinish = function(){
-            bandDetail.innerHTML = '';
+            bandDetail.querySelector('.detail').innerHTML = '';
+            bandDetail.querySelector('.detail_prev').innerHTML = '';
+            bandDetail.querySelector('.detail_next').innerHTML = '';
           };
      
 }
 
 function makeDetailView(){
-    var band = bands.find(band => band.id == document.querySelector('.detail').getAttribute('data-id'));
-    document.querySelector('.detail').innerHTML = makeBandCardBig(band);
+    var activeBandKey;
+    var band = bands.find(function(band,key){
+        activeBandKey = key;
+        return band.id == document.querySelector('.detailWrapper').getAttribute('data-id')
+    });
+
+    document.querySelector('.detail').innerHTML = makeBandDetailsHTML(band);
+
+    
+    var next_band = bands.find(function(band,key){
+        return key > activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
+    });
+    
+    var reverceBand = Array.from(bands).reverse();
+    var prev_band = reverceBand.find(function(band,key){
+        return key > bands.length - 1 - activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
+    });
+
+    if(next_band){
+        document.querySelector('.detail_next').innerHTML = makeBandDetailsPrevNextHTML(next_band);  
+    }
+    if(prev_band){
+        document.querySelector('.detail_prev').innerHTML = makeBandDetailsPrevNextHTML(prev_band);
+    }
+    // CHECK PÅ UNDEFIND
+
+
+    // if(activeBandKey > 0){
+        
+    // }
+    
+    // if(activeBandKey > 0 && appSettings[1].filterRatings[bands[activeBandKey-1].rating] != 0 ){
+    // }
+
+    // // CHECK PÅ DET IKKE ER SIDSTE
+    // if(true && appSettings[1].filterRatings[bands[activeBandKey-1].rating] != 0 ){
+    // }
+
     document.querySelector('.close-details').addEventListener('click', (e) => {
         e.preventDefault();
         clickCloseDetils();
     });
 }
 
-function makeBandCardBig(activeBand){
+function makeBandDetailsHTML(activeBand){
     return`
     <div class="col-12 d-flex flex-column h-100">
         <div class="d-flex justify-content-between">
@@ -280,16 +321,45 @@ function makeBandCardBig(activeBand){
             <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `active` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
             <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `active` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
         </div>
-        <div class="d-flex mt-3 px-5">
-        ${activeBand.id == parseInt(bands[0].id) ? ``: `<a href="" onclick="return prevBand(${activeBand.id})"><i class="em em-arrow_up"></i> Forige Band</a>`}
-        ${activeBand.id == parseInt(bands[bands.length-1].id) ? ``: `<a href="" onclick="return nextBand(${activeBand.id})" class="ml-auto">Næste Band <i class="em em-arrow_down"></i></i></a>`}
+    </div>
+    `
+}
+
+function makeBandDetailsPrevNextHTML(activeBand){
+    return`
+    <div class="col-12 d-flex flex-column h-100">
+        <div class="d-flex justify-content-between">
+            <h4>${activeBand.name}</h4>
         </div>
     </div>
     `
 }
 
+
 // KUN NEXT/PREV PÅ BANDS/RATINGS DER IKKE ER SKJULT
 
+// window.addEventListener('load', function(){
+
+//     var touchsurface = document.getElementById("detail");
+
+//     var ts;
+//     touchsurface.addEventListener('touchstart', function(e){
+//         ts = e.touches[0].clientY;
+//     }, false)
+
+//     touchsurface.addEventListener('touchend', function(e){
+//         bandId = this.dataset.id
+//         var te = e.changedTouches[0].clientY;
+//         if(ts > te+5){
+//             //console.log('UP');
+//             nextBand(parseInt(bandId));
+//         }else if(ts < te-5){
+//             //console.log('NED');
+//             prevBand(parseInt(bandId));
+//         }
+//     }, false)
+
+// }, false) // end window.onload
 
 function nextBand(bandId){
     const bandDetail = document.querySelector('.detail');
@@ -427,3 +497,4 @@ function arraySort(property) {
 }
 
 //localStorage.clear();
+

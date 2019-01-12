@@ -97,11 +97,26 @@ h5 {
     right: 1rem;
     top: 0;
 }
-.detail {
+.detailWrapper {
     position: fixed;
     -webkit-transform-origin: top left;
     transform-origin: top left;
+    padding: 1rem 2rem;
+    background: var(--bg);
+    overflow: auto;
     z-index: 12;
+}
+.detail {
+    min-height: 80vh;
+    border-radius: 30px;
+}
+.detail_prev {
+    min-height: 15vh;
+    margin-bottom: 5vh;
+}
+.detail_next {
+    min-height: 15vh;
+    margin-top: 5vh;
 }
 .settingsMenu {
     position: fixed;
@@ -141,7 +156,7 @@ h5 {
     filter: grayscale(100%);
 }
 @media screen and (orientation: portrait) {
-    .detail {
+    .detailWrapper {
         top: 0;
         left: 0;
         right: 0;
