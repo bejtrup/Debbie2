@@ -52,6 +52,7 @@ function changeEvent(_this){
     let eventId = _this.value;
     appSettings[0].eventSelected = eventId; 
     localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    this.document.getElementById('eventSelectedName').innerHTML = events[eventId].eventName;
     getDB(events[eventId].event_db_url);
 }
 
