@@ -25,6 +25,7 @@ window.onload = function(){
     makeEventSelector();
     makeSortmenu();
     getDB(events[appSettings[0].eventSelected].event_db_url);
+    scrollListnerDeTAILWRAPPER();
 }
 
 function makeEventSelector() {
@@ -170,6 +171,7 @@ function makeBandlistHTML(){
     clickOpenDetils();
 }
 
+
 function clickOpenDetils(){
     const allbandElements = document.querySelectorAll('.band');
     const bandDetail = document.querySelector('.detailWrapper');
@@ -221,53 +223,64 @@ function clickOpenDetils(){
 
         openDetail.onfinish = function(){
              makeDetailViewActiveElm(band);
-             var detailActiveScroll = bandDetail.scrollTop;
-             var isScrollingDetails;
-             bandDetail.addEventListener("scroll", function(e){
-                window.clearTimeout( isScrollingDetails );
-                isScrollingDetails = setTimeout(function() {
-                    
-                    if(bandDetail.scrollTop < detailActiveScroll/2){
-                        // PREV
-                        var bandId = document.querySelector('.detail.prev .col-12').getAttribute('data-bandId');
-                        
-                        if(bandId >= 0){
-                            var thisBand = bands.find(band => band.id == bandId);
-                            // if (bands.findIndex(band => band.id == bandId) > 0 ){
-                                bandDetail.setAttribute('data-id', bandId);
-                                makeDetailView();
-                                bandDetail.scrollTop = detailActiveScroll;
-                                makeDetailViewActiveElm(thisBand);
-
-                        } else{
-                            bandDetail.style.display = 'none';
-                            var all =  document.querySelectorAll('.detail');
-                            all.forEach(function(a){a.innerHTML = ''});
-                        }
-                    } 
-                    else if(bandDetail.scrollTop > (detailActiveScroll/2)+detailActiveScroll){
-                        // NEXT
-                        var bandId = document.querySelector('.detail.next .col-12').getAttribute('data-bandId');
-                        if(bandId >= 0){
-                            var thisBand = bands.find(band => band.id == bandId);
-                            bandDetail.setAttribute('data-id', bandId);
-                            makeDetailView();
-                            bandDetail.scrollTop = detailActiveScroll;
-                            makeDetailViewActiveElm(thisBand);
-                        }else{
-                            bandDetail.style.display = 'none';
-                            var all =  document.querySelectorAll('.detail');
-                            all.forEach(function(a){a.innerHTML = ''});
-                        }
-                    } 
-
-                }, 200);
-
-                
-            });
          };
       });
     });
+}
+
+function scrollListnerDeTAILWRAPPER(){
+    const bandDetail = document.querySelector('.detailWrapper');
+    var isScrollingDetails;
+
+    var isTouchDown = false;
+    bandDetail.addEventListener("touchstart", function(e){
+        isTouchDown = true;
+    });
+    bandDetail.addEventListener("touchend", function(e){
+        isTouchDown = false;
+    });
+
+    bandDetail.addEventListener("scroll", function(e){
+        if(!isTouchDown){
+            window.clearTimeout( isScrollingDetails );
+            isScrollingDetails = setTimeout(function() {
+                    let detailActiveScroll = bandDetail.scrollHeight;
+                if(bandDetail.scrollTop < detailActiveScroll/6){
+                    // PREV
+                    var bandId = parseInt( document.querySelector('.detail.prev .col-12').getAttribute('data-bandId') );
+                    
+                    if(bandId >= 0){
+                        var thisBand = bands.find(band => band.id == bandId);
+                            bandDetail.setAttribute('data-id', bandId);
+                            makeDetailView();
+                            bandDetail.scrollTop = detailActiveScroll/2-(document.querySelector('.detail.prev').scrollHeight*0.5);
+                            makeDetailViewActiveElm(thisBand);
+
+                    } else{
+                        bandDetail.style.display = 'none';
+                        var all =  document.querySelectorAll('.detail');
+                        all.forEach(function(a){a.innerHTML = ''});
+                    }
+                } 
+                else if(bandDetail.scrollTop > detailActiveScroll-(document.querySelector('.detail.next').scrollHeight*1.5)){
+                    // NEXT
+                    var bandId = parseInt( document.querySelector('.detail.next .col-12').getAttribute('data-bandId') );
+                    if(bandId >= 0){
+                        var thisBand = bands.find(band => band.id == bandId);
+                        bandDetail.setAttribute('data-id', bandId);
+                        makeDetailView();
+                        bandDetail.scrollTop = detailActiveScroll/2-(document.querySelector('.detail.next').scrollHeight*0.5);
+                        makeDetailViewActiveElm(thisBand);
+                    }else{
+                        bandDetail.style.display = 'none';
+                        var all =  document.querySelectorAll('.detail');
+                        all.forEach(function(a){a.innerHTML = ''});
+                    }
+                } 
+            }, 66);
+        }
+       
+   });
 }
 
 function makeDetailView(){
@@ -324,8 +337,10 @@ function makeDetailView(){
 }
 
 function makeDetailViewActiveElm(activeBand){
-    var details_body = document.querySelector(".detail.active .details_body");
-    details_body.innerHTML = makeBandDetailsBodyHTML(activeBand);
+    if(activeBand){
+        var details_body = document.querySelector(".detail.active .details_body");
+        details_body.innerHTML = makeBandDetailsBodyHTML(activeBand);
+    }
 }
 
 function clickCloseDetils(){
