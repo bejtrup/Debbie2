@@ -13,6 +13,9 @@
     --a: rgb(245, 209, 51);
     --text-p: #9EABEA;
   }
+  html {
+    touch-action: manipulation;
+  }
 body {
     background-color: var( --bg);
     color: var(--text-p);
@@ -128,8 +131,8 @@ h5 {
     position: absolute;
     left: -1rem;
     right: -1rem;
-    top: -2rem;
-    bottom: -2rem;
+    top: -5vh;
+    bottom: -20vh;
     z-index: -1;
 }
 
