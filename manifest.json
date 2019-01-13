@@ -1,10 +1,10 @@
 {
     "dir" : "ltr",
     "lang" : "dk",
-    "name" : "Debbie - styr på musikprogrammet",
+    "name" : "Debbie - lektiehjælp!",
     "scope" : "/",
     "display" : "standalone",
-    "start_url" : "https://bejtrup.github.io/Debbie2/",
+    "start_url" : "https://debbieapp.dk/",
     "short_name" : "Debbie",
     "theme_color" : "#6cc8c2",
     "description" : "Musikprogram",
