@@ -222,8 +222,8 @@ function clickOpenDetils(){
         });
 
         openDetail.onfinish = function(){
-             makeDetailViewActiveElm(band);
-         };
+
+        };
       });
     });
 }
@@ -244,18 +244,57 @@ function scrollListnerDeTAILWRAPPER(){
         if(!isTouchDown){
             window.clearTimeout( isScrollingDetails );
             isScrollingDetails = setTimeout(function() {
-                    let detailActiveScroll = bandDetail.scrollHeight;
+            let detailActiveScroll = bandDetail.scrollHeight;
                 if(bandDetail.scrollTop < detailActiveScroll/6){
                     // PREV
                     var bandId = parseInt( document.querySelector('.detail.prev .col-12').getAttribute('data-bandId') );
                     
                     if(bandId >= 0){
-                        var thisBand = bands.find(band => band.id == bandId);
                             bandDetail.setAttribute('data-id', bandId);
-                            makeDetailView();
-                            bandDetail.scrollTop = detailActiveScroll/2-(document.querySelector('.detail.prev').scrollHeight*0.5);
-                            makeDetailViewActiveElm(thisBand);
+                            // next = remove
+                            var nextBand = document.querySelector('.detail.next');
+                            nextBand.parentNode.removeChild(nextBand);
+                            // active = next
+                            var activeBand = document.querySelector('.detail.active');
+                            activeBand.classList.add("next");
+                            activeBand.classList.remove("active");
+                            // prev = actve
+                            var prevBand = document.querySelector('.detail.prev');
+                            prevBand.classList.add("active");
+                            prevBand.classList.remove("prev");
+                            // new Prev
+                            var newPrev = document.createElement("div");
+                            newPrev.setAttribute("class", "detail row my-5 prev");
+                            bandDetail.prepend(newPrev);
 
+                            var activeBandKey;
+                            bands.find(function(band,key){
+                                activeBandKey = key;
+                                return band.id == document.querySelector('.detailWrapper').getAttribute('data-id')
+                            });
+                            var reverceBand = Array.from(bands).reverse();
+                            var thisBand = reverceBand.find(function(band,key){
+                                return key > bands.length - 1 - activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
+                            });
+
+                            //CHECK ON UNDEFIED
+                            if(!thisBand){
+                                thisBand= {
+                                    "id": -2,
+                                    "name": "Førsteband BAND",
+                                    "HeadlineScore": -1,
+                                    "date": "-",
+                                    "time": "-",
+                                    "duration": -1,
+                                    "stage": "-",
+                                    "iframe": "-",
+                                    "rating": -1
+                                  }
+                            }
+                            document.querySelector('.detail.prev').innerHTML = makeBandDetailsHTML(thisBand);
+                            bandDetail.scrollTop =document.querySelector('.detail.prev').scrollHeight;
+
+                            
                     } else{
                         bandDetail.style.display = 'none';
                         var all =  document.querySelectorAll('.detail');
@@ -266,11 +305,50 @@ function scrollListnerDeTAILWRAPPER(){
                     // NEXT
                     var bandId = parseInt( document.querySelector('.detail.next .col-12').getAttribute('data-bandId') );
                     if(bandId >= 0){
-                        var thisBand = bands.find(band => band.id == bandId);
                         bandDetail.setAttribute('data-id', bandId);
-                        makeDetailView();
-                        bandDetail.scrollTop = detailActiveScroll/2-(document.querySelector('.detail.next').scrollHeight*0.5);
-                        makeDetailViewActiveElm(thisBand);
+                        
+                        // PREV = DØ
+                        var prevBand = document.querySelector('.detail.prev');
+                        prevBand.parentNode.removeChild(prevBand);
+                        // NEXT = ACTIVE
+                        var nextBand = document.querySelector('.detail.next');
+                        nextBand.classList.add("active");
+                        nextBand.classList.remove("next");
+                        // ACTIVE = PREV
+                        var activeBand = document.querySelector('.detail.active');
+                        activeBand.classList.add("prev");
+                        activeBand.classList.remove("active");
+                        // NEW NEXT
+                        var newNext = document.createElement("div");
+                        newNext.setAttribute("class", "detail row my-5 next");
+                        bandDetail.appendChild(newNext);
+
+                        var activeBandKey;
+                        bands.find(function(band,key){
+                            activeBandKey = key;
+                            return band.id == document.querySelector('.detailWrapper').getAttribute('data-id')
+                        });
+                        var thisBand = bands.find(function(band,key){
+                            return key > activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
+                        });
+
+                        //CHECK ON UNDEFIED
+                        if(!thisBand){
+                            thisBand= {
+                                "id": -1,
+                                "name": "SIDSTE BAND",
+                                "HeadlineScore": -1,
+                                "date": "-",
+                                "time": "-",
+                                "duration": -1,
+                                "stage": "-",
+                                "iframe": "-",
+                                "rating": -1
+                              }
+                        }
+                        document.querySelector('.detail.next').innerHTML = makeBandDetailsHTML(thisBand);
+                        bandDetail.scrollTop =document.querySelector('.detail.prev').scrollHeight;
+
                     }else{
                         bandDetail.style.display = 'none';
                         var all =  document.querySelectorAll('.detail');
@@ -336,13 +414,6 @@ function makeDetailView(){
     }
 }
 
-function makeDetailViewActiveElm(activeBand){
-    if(activeBand){
-        var details_body = document.querySelector(".detail.active .details_body");
-        details_body.innerHTML = makeBandDetailsBodyHTML(activeBand);
-    }
-}
-
 function clickCloseDetils(){
     const bandDetail = document.querySelector('.detailWrapper');
     const activeDetails = document.querySelector('.detail.active');
@@ -392,25 +463,16 @@ function makeBandDetailsHTML(activeBand){
             <a class="close-details text-bg p-2" onclick="return clickCloseDetils();" href=""><i class="fas fa-times"></i></a>
         </div>
         <div class="details_body d-flex flex-column h-100">
-            <span class="d-flex h-100 justify-content-center align-items-center">
-                <i class="fas fa-spinner fa-3x fa-spin"></i>
-            </span>
+            <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
+            <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
+            <div class="ratebar mt-auto d-flex justify-content-around py-3">
+                <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `activeRating` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
+                <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `activeRating` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
+                <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `activeRating` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
+                <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `activeRating` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
+            </div> 
         </div>
     </div>
-    `
-}
-
-
-function makeBandDetailsBodyHTML(activeBand){
-    return`
-    <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
-    <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
-    <div class="ratebar mt-auto d-flex justify-content-around py-3">
-        <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `activeRating` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
-        <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `activeRating` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
-        <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `activeRating` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
-        <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `activeRating` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
-   </div> 
     `
 }
 
