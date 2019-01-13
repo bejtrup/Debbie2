@@ -230,45 +230,36 @@ function clickOpenDetils(){
                     if(bandDetail.scrollTop < detailActiveScroll/2){
                         // PREV
                         var bandId = document.querySelector('.detail.prev .col-12').getAttribute('data-bandId');
-                        var thisBand = bands.find(band => band.id == bandId);
-                        if (bands.findIndex(band => band.id == bandId) > 0 ){
-                            bandDetail.setAttribute('data-id', bandId);
-                            makeDetailView();
-                            bandDetail.scrollTop = detailActiveScroll;
-                            makeDetailViewActiveElm(thisBand);
-                        } 
-                        else{
-                            var details_body = document.querySelector(".detail.active .details_body");
-                            details_body.innerHTML = "";
-                            var prev_details_body = document.querySelector(".detail.next .details_body");
-                            prev_details_body.innerHTML = makeBandDetailsBodyHTML(thisBand);
+                        
+                        if(bandId >= 0){
+                            var thisBand = bands.find(band => band.id == bandId);
+                            // if (bands.findIndex(band => band.id == bandId) > 0 ){
+                                bandDetail.setAttribute('data-id', bandId);
+                                makeDetailView();
+                                bandDetail.scrollTop = detailActiveScroll;
+                                makeDetailViewActiveElm(thisBand);
+
+                        } else{
+                            bandDetail.style.display = 'none';
+                            var all =  document.querySelectorAll('.detail');
+                            all.forEach(function(a){a.innerHTML = ''});
                         }
                     } 
                     else if(bandDetail.scrollTop > (detailActiveScroll/2)+detailActiveScroll){
                         // NEXT
-                        var totalVisibleBAndCards = 0;
-                        document.querySelectorAll('.band-card').forEach(function(a){if(a.offsetParent){totalVisibleBAndCards++}} )
                         var bandId = document.querySelector('.detail.next .col-12').getAttribute('data-bandId');
-                        var thisBand = bands.find(band => band.id == bandId);
-                        if (bands.findIndex(band => band.id == bandId) < totalVisibleBAndCards-1 ){
-                            var bandId = document.querySelector('.detail.next .col-12').getAttribute('data-bandId');
+                        if(bandId >= 0){
+                            var thisBand = bands.find(band => band.id == bandId);
                             bandDetail.setAttribute('data-id', bandId);
                             makeDetailView();
                             bandDetail.scrollTop = detailActiveScroll;
                             makeDetailViewActiveElm(thisBand);
-                        } else{
-                            var details_body = document.querySelector(".detail.active .details_body");
-                            details_body.innerHTML = "";
-                            var next_details_body = document.querySelector(".detail.next .details_body");
-                            next_details_body.innerHTML = makeBandDetailsBodyHTML(thisBand);
+                        }else{
+                            bandDetail.style.display = 'none';
+                            var all =  document.querySelectorAll('.detail');
+                            all.forEach(function(a){a.innerHTML = ''});
                         }
-                    } else {
-                        if(document.querySelector(".detail.active .details_body").innerHTML == ""){
-                            var bandId = document.querySelector('.detail.active .col-12').getAttribute('data-bandId');
-                            var thisBand = bands.find(band => band.id == bandId);
-                            makeDetailViewActiveElm(thisBand);
-                        }
-                    }
+                    } 
 
                 }, 200);
 
@@ -299,13 +290,37 @@ function makeDetailView(){
 
     if(next_band){
         document.querySelector('.detail.next').innerHTML = makeBandDetailsHTML(next_band);  
+    } else{
+        var next_filler = {
+            "id": -1,
+            "name": "SIDSTE BAND",
+            "HeadlineScore": -1,
+            "date": "-",
+            "time": "-",
+            "duration": -1,
+            "stage": "-",
+            "iframe": "-",
+            "rating": -1
+          }
+        document.querySelector('.detail.next').innerHTML = makeBandDetailsHTML(next_filler); 
     }
+
     if(prev_band){
         document.querySelector('.detail.prev').innerHTML = makeBandDetailsHTML(prev_band);
+    } else{
+        var prev_filler = {
+            "id": -2,
+            "name": "Førsteband BAND",
+            "HeadlineScore": -1,
+            "date": "-",
+            "time": "-",
+            "duration": -1,
+            "stage": "-",
+            "iframe": "-",
+            "rating": -1
+          }
+        document.querySelector('.detail.prev').innerHTML = makeBandDetailsHTML(prev_filler);
     }
-
-
-
 }
 
 function makeDetailViewActiveElm(activeBand){
@@ -356,7 +371,7 @@ function clickCloseDetils(){
 
 function makeBandDetailsHTML(activeBand){
     return`
-    <div class="col-12 p-3 d-flex flex-column ${getColor(activeBand.rating)}" data-bandid="${activeBand.id}">
+    <div class="col-12 p-3 d-flex flex-column ${getColor(activeBand.rating)} ${activeBand.id < 0 ? `hidden` : ``}" data-bandid="${activeBand.id}">
         <div class="d-flex justify-content-between mb-3">
             <h1>${activeBand.name}</h1>
             <a class="close-details text-bg p-2" onclick="return clickCloseDetils();" href=""><i class="fas fa-times"></i></a>
