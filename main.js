@@ -2,6 +2,7 @@
 var bands = [];
 var spData = null;
 var localStoragedReatings = [];
+var eventUpdateLog = [];
 
 //https://gist.github.com/terrywbrady/a03b25fe42959b304b1e
 const events = [
@@ -24,7 +25,7 @@ window.onload = function(){
     getSettingsFromLS();
     makeEventSelector();
     makeSortmenu();
-    getDB(events[appSettings[0].eventSelected].event_db_url);
+    checkDbNeedUpdate(events[appSettings[0].eventSelected].eventId, events[appSettings[0].eventSelected].event_db_url);
     scrollListnerDeTAILWRAPPER();
 }
 
@@ -38,7 +39,62 @@ function makeEventSelector() {
     document.getElementById('eventSelectorWrapper').innerHTML = SelectorHTML;
 }  
 
+function updateDbNow(){
+    getDB(events[appSettings[0].eventSelected].event_db_url);
+    var now = new Date();
+    // now.setDate(now.getDate() - 1);
+    // now.setHours(now.getHours() - 1);
+    var y = now.getFullYear();
+    var m = now.getMonth() +1;
+    var d = now.getDate();
+    var h = now.getHours();
+    var nowArray = [d,m,y,h];
+    eventUpdateLog.find(b=>b.eventId == events[appSettings[0].eventSelected].eventId).lastUpdate = nowArray;
+    localStorage.setItem('eventUpdateLog', JSON.stringify(eventUpdateLog));
+}
+
+function checkDbNeedUpdate(db_id, db_url){
+    var now = new Date();
+    // now.setDate(now.getDate() - 1);
+    // now.setHours(now.getHours() - 1);
+    var y = now.getFullYear();
+    var m = now.getMonth() +1;
+    var d = now.getDate();
+    var h = now.getHours();
+    var nowArray = [d,m,y,h];
+
+    if( localStorage.getItem("eventUpdateLog") ){
+        eventUpdateLog = JSON.parse(localStorage.getItem("eventUpdateLog"));
+    } 
+    else {
+        for (let index = 0; index < events.length; index++) {
+        eventUpdateLog.push({eventId: events[index].eventId, lastUpdate: nowArray});
+        }
+        localStorage.setItem('eventUpdateLog', JSON.stringify(eventUpdateLog));
+    }
+    var eventLastUpdate = eventUpdateLog.find(b=>b.eventId == db_id).lastUpdate;
+    var moreThan24h = nowArray[0] > eventLastUpdate[0] && nowArray[1] >= eventLastUpdate[1] && nowArray[2] >= eventLastUpdate[2] && nowArray[3] > eventLastUpdate[3];
+    
+    if(moreThan24h){
+        console.log("time for update bands[]");
+        getDB(db_url);
+        eventUpdateLog.find(b=>b.eventId == db_id).lastUpdate = nowArray;
+        localStorage.setItem('eventUpdateLog', JSON.stringify(eventUpdateLog));
+    }
+    else{
+        if( localStorage.getItem("bandsFromStorrage") ){
+            bands = JSON.parse(localStorage.getItem("bandsFromStorrage"))[db_id];  
+            SortBands();
+            makeBandlistHTML();
+        }
+        else{
+            getDB(db_url);
+        }
+    }
+}
+
 function getDB(db_url){
+    console.log("getting bands[] from db");
     document.getElementById("bandlist").innerHTML = "henter bands...";
     var script = document.createElement('script');
     script.src = db_url;
@@ -55,7 +111,8 @@ function changeEvent(_this){
     appSettings[0].eventSelected = eventId; 
     localStorage.setItem('appSettings', JSON.stringify(appSettings));
     this.document.getElementById('eventSelectedName').innerHTML = events[eventId].eventName;
-    getDB(events[eventId].event_db_url);
+    
+    checkDbNeedUpdate(eventId, events[eventId].event_db_url);
 }
 
 
@@ -99,6 +156,11 @@ function makeBands() {
     pushReatingToBands();
     SortBands();
     makeBandlistHTML();
+
+    var bandsFromStorrage = JSON.parse(localStorage.getItem("bandsFromStorrage"));
+
+    bandsFromStorrage[events[appSettings[0].eventSelected].eventId] = bands;
+    localStorage.setItem('bandsFromStorrage', JSON.stringify(bandsFromStorrage));
 }
 
 function pushReatingToBands(){
@@ -166,8 +228,13 @@ function makeBandlistHTML(){
                 </div>
             </div>
         </div>   
-    `).join('')}`;
+    `).join('')}`;  
     document.getElementById("bandlist").innerHTML = bandCard_Small;
+    
+    let lastUpdateArray = eventUpdateLog[events[appSettings[0].eventSelected].eventId].lastUpdate;
+    const bandLastUpdateHTML = `<h6><small>Band liste sidst opdateret: ${lastUpdateArray[0]}/${lastUpdateArray[1]}/${lastUpdateArray[2]} kl ${lastUpdateArray[3]}:00</small><a onclick="return updateDbNow();" class="ml-2"><i class="fas fa-sync-alt"></i></a></h6>`;
+    
+    document.getElementById("bandUpdate").innerHTML = bandLastUpdateHTML;
     clickOpenDetils();
 }
 
@@ -475,5 +542,3 @@ function makeBandDetailsHTML(activeBand){
     </div>
     `
 }
-
-
