@@ -18,7 +18,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
-    
+    <!-- Include the polyfill -->
+    <script src="node_modules/web-animations-js/web-animations.min.js"></script>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     
     <script defer src="https://use.fontawesome.com/releases/v5.6.3/js/all.js" integrity="sha384-EIHISlAOj4zgYieurP0SdoiBYfGJKkgWedPHH4jCzpCXLmzVsw1ouK59MuUtP4a1" crossorigin="anonymous"></script>
@@ -29,7 +31,7 @@
 
 </head>
 <body>
-    <div id='container' class="container pt-5 mx-0">
+    <div id='container' class="container pt-5 mx-0 mx-sm-auto">
         <div id="header" class="header row justify-content-between align-items-center px-3 py-4">
                 <div class="">
                     <i class="far fa-question-circle text-bg"></i>
