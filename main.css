@@ -118,6 +118,9 @@ h5 {
 
     scroll-snap-type: y mandatory;
     scroll-padding: 7vh;
+    
+    overflow-y: scroll; /* has to be scroll, not auto */
+    -webkit-overflow-scrolling: touch;
 }
 .detail {
     position: relative;
@@ -268,6 +271,8 @@ h5 {
     min-height: 100vh;
     max-height: 100vh;
     overflow: auto;
+    overflow-y: scroll; /* has to be scroll, not auto */
+    -webkit-overflow-scrolling: touch;
 }
 
 .custom-select-lg {

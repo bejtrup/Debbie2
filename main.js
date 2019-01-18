@@ -1,4 +1,3 @@
-
 var bands = [];
 var spData = null;
 var localStoragedReatings = [];
@@ -85,6 +84,7 @@ function checkDbNeedUpdate(db_id, db_url){
         if( localStorage.getItem("bandsFromStorrage") ){
             bands = JSON.parse(localStorage.getItem("bandsFromStorrage"))[db_id];  
             SortBands();
+            pushReatingToBands();
             makeBandlistHTML();
         }
         else{
@@ -157,7 +157,7 @@ function makeBands() {
     SortBands();
     makeBandlistHTML();
 
-    var bandsFromStorrage = JSON.parse(localStorage.getItem("bandsFromStorrage"));
+    var bandsFromStorrage = JSON.parse(localStorage.getItem("bandsFromStorrage")) || [];
 
     bandsFromStorrage[events[appSettings[0].eventSelected].eventId] = bands;
     localStorage.setItem('bandsFromStorrage', JSON.stringify(bandsFromStorrage));
