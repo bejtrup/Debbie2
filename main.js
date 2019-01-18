@@ -527,7 +527,7 @@ function makeBandDetailsHTML(activeBand){
     <div class="col-12 p-3 d-flex flex-column ${getColor(activeBand.rating)} ${activeBand.id < 0 ? `hidden` : ``}" data-bandid="${activeBand.id}">
         <div class="d-flex justify-content-between mb-3">
             <h1>${activeBand.name}</h1>
-            <a class="close-details text-bg p-2" onclick="return clickCloseDetils();" href=""><i class="fas fa-times"></i></a>
+            <a class="close-details text-dark-s p-2" onclick="return clickCloseDetils();" href=""><i class="fas fa-times"></i></a>
         </div>
         <div class="details_body d-flex flex-column h-100">
             <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
