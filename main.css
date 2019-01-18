@@ -148,7 +148,9 @@ h5 {
 .detail .hidden:after {
     background: rgba(16, 21, 63, 0.6); 
 }
-
+.close-details{
+    color: rgba(2, 9, 49, 0.74);
+}
 
 .settingsMenu {
     position: fixed;
