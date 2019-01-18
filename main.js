@@ -7,7 +7,7 @@ var eventUpdateLog = [];
 const events = [
     {
         eventId: 0,
-        eventName: "Roskilde",
+        eventName: "Roskilde!",
         eventColor: "#BADA55",
         event_db_url: "https://spreadsheets.google.com/feeds/cells/1g74O7oBzVSO_0rKN178agKng0AvSVf0MUKmK6iadSuE/1/public/values?alt=json-in-script&callback=doData"
     },
