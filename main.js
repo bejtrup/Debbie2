@@ -216,16 +216,19 @@ function makeBandlistHTML(){
     const bandCard_Small = 
     `${bands.map(band => `
         <div class="band row mb-2 " data-id="${band.id}" data-filterRatingId="${(band.rating)}" style="${appSettings[1].filterRatings[band.rating] == 1 ? `` : `display: none`}">
-            <div class="band-card col-12 p-3 d-flex align-items-center rounded ${getColor(band.rating)}">
-                <div class="mr-3 bg-em p-2 rounded-circle">
+            <div class="band-card col-12 p-3 rounded ${getColor(band.rating)}">
+                <div class="row d-flex flex-nowrap mx-0">
+                    <div class="mr-2 bg-em p-2 rounded-circle">
                         <i class="em-svg ${getIconName(band.rating)}"></i>      
+                    </div>
+                    <div>
+                        <h4 class="m-0">${band.name}</h4>
+                        <h5 class="m-0" >${getStage(band.stage)} : Tirsdag d. 29 kl 19:00</h5>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="m-0">${band.name}</h4>
-                    <h5 class="m-0" >${getStage(band.stage)} : Tirsdag d. 29 kl 19:00</h5>
-                </div>
+                <div class="band-details row mx-0"></div>
             </div>
-        </div>   
+        </div>  
     `).join('')}`;  
     document.getElementById("bandlist").innerHTML = bandCard_Small;
     
@@ -236,223 +239,88 @@ function makeBandlistHTML(){
     clickOpenDetils();
 }
 
-
+var bandShowing = 'none';
 function clickOpenDetils(){
     const allbandElements = document.querySelectorAll('.band');
-    const bandDetail = document.querySelector('.detailWrapper');
-    const swiperContainer  = document.querySelector('.swiper-container');
-    bandDetail.style.display = 'none';
-    
+    var currentOpenBandHeight = null; 
     allbandElements.forEach((bandElem) => {
         bandElem.addEventListener('click', () => {
-        var band = bands.find(x => x.id == bandElem.getAttribute('data-id'));
-        bandDetail.setAttribute('data-id', band.id);
-        bandDetail.style.display = 'flex';
-        
-        makeDetailView(); 
-        var firstload = false;
-        bandDetailSlider = new Swiper('.swiper-container', {
-            initialSlide: 1,
-            width: window.innerWidth,
-            on: {
-                init: function () {
-                    swiperContainer.animate([
-                        {
-                          transform: `
-                            translateY(100vh)
-                          `
-                        }
-                       ,
-                        {
-                          transform: `
-                            translateY(0)
-                           `
-                        }
-                       ], {
-                        duration: 400,
-                        easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
-                      });
-                },
-                slideChange: function () {
-                    if(firstload){
-                        updateSlids();
-                    }
-                    firstload = true
-                },
+            var band = bands.find(x => x.id == bandElem.getAttribute('data-id'));
+            if(bandShowing == 'none'){
+                currentOpenBandHeight = bandElem.offsetHeight;
+                showBandDetails(bandElem, band)
+                bandShowing = band.id;
             }
-        });
+            else if(bandShowing == band.id){
+                hideBandDetails(bandElem);
+                bandShowing = 'none';
+            }
+            else {
+                hideBandDetails(document.querySelector('#bandlist .band[data-id="'+bandShowing+'"]'));
+                currentOpenBandHeight = bandElem.offsetHeight;
+
+
+                showBandDetails(bandElem,band);
+                bandShowing = band.id;
+            }
       });
     });
-}
-
-function updateSlids(){
-    const bandDetail = document.querySelector('.detailWrapper');
-    var slidesInTotal = bandDetailSlider.slides.length;
-    var currentSlide = bandDetailSlider.activeIndex;
-    var currentBandId = bandDetailSlider.slides[currentSlide].querySelector(".col-12").getAttribute('data-bandId')
-    var newElement = '';
-
-    if(currentSlide == slidesInTotal-1){
-        var activeBandKey;
-        bands.find(function(band,key){
-            activeBandKey = key;
-            return band.id == currentBandId;
-        });
-        var nextBand = bands.find(function(band,key){
-            return key > activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
-        });
+    function showBandDetails(bandElem, band){
+        bandElem.querySelector(".band-details").innerHTML = makeBandDetailsHTML(band);
+        var fullHeight = bandElem.scrollHeight;
+        bandElem.querySelector(".band-details").style.display = "none"
         
-        if(!nextBand){
-            nextBand= {
-                "id": -1,
-                "name": "SIDSTE BAND",
-                "HeadlineScore": -1,
-                "date": "-",
-                "time": "-",
-                "duration": -1,
-                "stage": "-",
-                "iframe": "-",
-                "rating": -1
+        var showBandDetails = bandElem.animate([
+            {
+                height: currentOpenBandHeight+'px'
             }
-        }
-        newElement = makeBandDetailsHTML(nextBand)
-        bandDetailSlider.appendSlide(newElement);
-        console.log("next Made ID=", nextBand.id)
-    }
-    if (currentSlide == 0) {
-        var activeBandKey;
-        bands.find(function(band,key){
-            activeBandKey = key;
-            return band.id == currentBandId
-        });
-        var reverceBand = Array.from(bands).reverse();
-        var prevBand = reverceBand.find(function(band,key){
-            return key > bands.length - 1 - activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
-        });
-
-        //CHECK ON UNDEFIED
-        if(!prevBand){
-            prevBand= {
-                "id": -2,
-                "name": "Førsteband BAND",
-                "HeadlineScore": -1,
-                "date": "-",
-                "time": "-",
-                "duration": -1,
-                "stage": "-",
-                "iframe": "-",
-                "rating": -1
-              }
-        }
-        newElement = makeBandDetailsHTML(prevBand);
-        bandDetailSlider.prependSlide(newElement);
-        console.log("prev Made",prevBand.name)
-    }
-    if(currentBandId < 0){
-        bandDetail.style.display = 'none';
-        bandDetail.innerHTML = '';
-    }
-
-    bandDetail.setAttribute('data-id', currentBandId);
-
-}
-
-function makeDetailView(){
-    const bandDetail = document.querySelector('.detailWrapper');
-    var activeBandKey;
-    var band = bands.find(function(band,key){
-        activeBandKey = key;
-        return band.id == document.querySelector('.detailWrapper').getAttribute('data-id')
-    });
-
-    var next_band = bands.find(function(band,key){
-        return key > activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
-    });
-    
-    var reverceBand = Array.from(bands).reverse();
-    var prev_band = reverceBand.find(function(band,key){
-        return key > bands.length - 1 - activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
-    });
-
-    if(!next_band){
-        next_band = {
-            "id": -1,
-            "name": "SIDSTE BAND",
-            "HeadlineScore": -1,
-            "date": "-",
-            "time": "-",
-            "duration": -1,
-            "stage": "-",
-            "iframe": "-",
-            "rating": -1
+           ,
+            {
+                height: fullHeight+'px'
+            }
+           ], {
+            duration: 300,
+            fill: "forwards",
+            easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
+          });
+          
+           showBandDetails.onfinish = function(){
+                bandElem.querySelector(".band-details").style.display = "flex";
+                let wrapper = document.querySelector("#container"); // the wrapper we will scroll inside
+                let count = bandElem.offsetTop - wrapper.scrollTop - document.querySelector("#header").scrollHeight  // xx = any extra distance from top ex. 60
+                wrapper.scrollBy({top: count, left: 0, behavior: 'smooth'})
           }
     }
-    if(!prev_band){
-        prev_band = {
-            "id": -2,
-            "name": "Førsteband BAND",
-            "HeadlineScore": -1,
-            "date": "-",
-            "time": "-",
-            "duration": -1,
-            "stage": "-",
-            "iframe": "-",
-            "rating": -1
-          }
+    function hideBandDetails(bandElem){
+        bandElem.querySelector(".band-details").innerHTML = "";
+        var showBandDetails = bandElem.animate([
+            {
+                height: '60vh'
+            }
+           ,
+            {
+                height: currentOpenBandHeight+'px'
+            }
+           ], {
+            duration: 300,
+            fill: "forwards",
+            easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
+          });
     }
-
-    bandDetail.innerHTML = makeBandDetailsHTML(prev_band) + makeBandDetailsHTML(band) + makeBandDetailsHTML(next_band);
-}
-
-function clickCloseDetils(){
-    const bandDetail = document.querySelector('.detailWrapper');
-    const swiperContainer = document.querySelector('.swiper-container');
-     band_card = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
-    
-    var closeDetail = swiperContainer.animate([
-        {
-          zIndex: 20,
-          transform: `
-            translateY(0)
-          `
-        },
-        {
-          zIndex: 2,
-          transform: `
-            translateY(100vh)
-           `
-        }
-      ], {
-        duration: 400,
-        easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
-      });
-
-      closeDetail.onfinish = function(){
-        bandDetail.style.display = 'none';
-        bandDetail.innerHTML = '';
-      };
-      return false;
 }
 
 function makeBandDetailsHTML(activeBand){
     return`
-    <div class="swiper-slide detail row p-0 m-0" data-id="">
-        <div class="col-12 p-3 d-flex flex-column ${getColor(activeBand.rating)} ${activeBand.id < 0 ? `hidden` : ``}" data-bandid="${activeBand.id}">
-            <div class="d-flex justify-content-between mb-3">
-                <h1>${activeBand.name}</h1>
-                <a class="close-details p-2" onclick="return clickCloseDetils();" href=""><i class="fas fa-times"></i></a>
-            </div>
-            <div class="details_body d-flex flex-column h-100">
-                <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
-                <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
-                <div class="ratebar mt-auto d-flex justify-content-around py-3">
-                    <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `activeRating` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
-                    <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `activeRating` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
-                    <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `activeRating` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
-                    <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `activeRating` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
-                </div> 
-            </div>
+        <div class="col-12 mt-3" >
+            <div class="details_body d-flex flex-column">
+            <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
+            <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
         </div>
-    </div>
-    `
-}
+        <div class="ratebar col-12 d-flex justify-content-around align-items-center px-0 py-4">
+            <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `activeRating` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
+            <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `activeRating` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
+            <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `activeRating` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
+            <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `activeRating` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
+        </div>
+        `
+    }

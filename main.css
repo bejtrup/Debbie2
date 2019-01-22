@@ -116,6 +116,9 @@ h5 {
 .detail .hidden {
     opacity: 0;
 }
+.details_body {
+    /* max-height: 50%; */
+}
 .close-details{
     color: rgba(2, 9, 49, 0.74);
 }
