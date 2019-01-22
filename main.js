@@ -191,19 +191,15 @@ function setRating(_this, id, rating){
     activeband.rating = rating;
     
     var band_card = document.querySelector('.band[data-id="'+id+'"]');
-    band_card.style.display = 'block';   
+    //band_card.style.display = 'block';   
     band_card.dataset.filterratingid = rating.toString();
     removeClassByPrefix(band_card.querySelector(".band-card"),"bg-")
     band_card.querySelector(".band-card").className += " " + getColor(rating);
     band_card.classList.remove()
     band_card.querySelector(".em-svg").className = 'em-svg ' + getIconName(rating);
-    if(appSettings[1].filterRatings[rating] == 0){
-        band_card.style.display = 'none';
-    }
-    const bandDetail_Child = document.querySelector('.detail.active .col-12');
-    removeClassByPrefix(bandDetail_Child,"bg-");
-    bandDetail_Child.className += " " + getColor(rating);
-
+    // if(appSettings[1].filterRatings[rating] == 0){
+    //     band_card.style.display = 'none';
+    // }
     return false;
 }
 function removeClassByPrefix(el, prefix) {
@@ -240,11 +236,15 @@ function makeBandlistHTML(){
 }
 
 var bandShowing = 'none';
+var currentOpenBandHeight = null; 
+
 function clickOpenDetils(){
     const allbandElements = document.querySelectorAll('.band');
-    var currentOpenBandHeight = null; 
     allbandElements.forEach((bandElem) => {
-        bandElem.addEventListener('click', () => {
+        bandElem.addEventListener('click', (event) => {
+            if(event.target.className.length){
+                if (event.target.className.indexOf("em-svg") >= 0 ) return;
+            }
             var band = bands.find(x => x.id == bandElem.getAttribute('data-id'));
             if(bandShowing == 'none'){
                 currentOpenBandHeight = bandElem.offsetHeight;
@@ -258,8 +258,6 @@ function clickOpenDetils(){
             else {
                 hideBandDetails(document.querySelector('#bandlist .band[data-id="'+bandShowing+'"]'));
                 currentOpenBandHeight = bandElem.offsetHeight;
-
-
                 showBandDetails(bandElem,band);
                 bandShowing = band.id;
             }
@@ -291,26 +289,46 @@ function clickOpenDetils(){
                 wrapper.scrollBy({top: count, left: 0, behavior: 'smooth'})
           }
     }
-    function hideBandDetails(bandElem){
-        bandElem.querySelector(".band-details").innerHTML = "";
-        var showBandDetails = bandElem.animate([
-            {
-                height: '60vh'
+}
+function hideBandDetails(bandElem){
+    bandElem.querySelector(".band-details").innerHTML = "";
+    var hideBandDetails = bandElem.animate([
+        {
+            height: '60vh'
+        }
+        ,
+        {
+            height: currentOpenBandHeight+'px'
+        }
+        ], {
+        duration: 300,
+        fill: "forwards",
+        easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
+        });
+        hideBandDetails.onfinish = function(){
+            // loop troung array
+            for (let index = 0; index < appSettings[1].filterRatings.length; index++) {
+                if(appSettings[1].filterRatings[index] == 0){
+                    var filterRatingId = index;
+                    var allbandsWithRating = document.querySelectorAll("[data-filterRatingId = '"+filterRatingId+"']");
+                    hideAllwithRating(allbandsWithRating);
+                }
             }
-           ,
-            {
-                height: currentOpenBandHeight+'px'
-            }
-           ], {
-            duration: 300,
-            fill: "forwards",
-            easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
-          });
-    }
+
+        }
+}
+
+function clickCloseDetils(id){
+        // hideBandDetails(document.querySelector('.band[data-id="'+id+'"]'));
+        // bandShowing = 'none';
+        return false;
 }
 
 function makeBandDetailsHTML(activeBand){
     return`
+        <div style="position: absolute; top: 1rem; right: 1rem;">
+            <a class="close-details p-2" onclick="return clickCloseDetils(${activeBand.id});" href=""><i class="fas fa-times"></i></a>
+        </div>
         <div class="col-12 mt-3" >
             <div class="details_body d-flex flex-column">
             <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
