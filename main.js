@@ -240,49 +240,57 @@ function makeBandlistHTML(){
 function clickOpenDetils(){
     const allbandElements = document.querySelectorAll('.band');
     const bandDetail = document.querySelector('.detailWrapper');
+    const swiperContainer  = document.querySelector('.swiper-container');
     bandDetail.style.display = 'none';
     
     allbandElements.forEach((bandElem) => {
         bandElem.addEventListener('click', () => {
         var band = bands.find(x => x.id == bandElem.getAttribute('data-id'));
         bandDetail.setAttribute('data-id', band.id);
-        bandDetail.style.display = 'block';
+        bandDetail.style.display = 'flex';
         
-        makeDetailView();        
-        var openDetail = bandDetail.animate([
-          {
-            transform: `
-              translateY(100vh)
-            `
-          }
-         ,
-          {
-            transform: `
-              translateY(0)
-             `
-          }
-         ], {
-          duration: 400,
-          easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
+        makeDetailView(); 
+        var firstload = false;
+        bandDetailSlider = new Swiper('.swiper-container', {
+            initialSlide: 1,
+            width: window.innerWidth,
+            on: {
+                init: function () {
+                    swiperContainer.animate([
+                        {
+                          transform: `
+                            translateY(100vh)
+                          `
+                        }
+                       ,
+                        {
+                          transform: `
+                            translateY(0)
+                           `
+                        }
+                       ], {
+                        duration: 400,
+                        easing: 'cubic-bezier(0.2, 0, 0.2, 1)'
+                      });
+                },
+                slideChange: function () {
+                    if(firstload){
+                        updateSlids();
+                    }
+                    firstload = true
+                },
+            }
         });
-
-        openDetail.onfinish = function(){
-
-        };
       });
     });
 }
 
-
 function updateSlids(){
     const bandDetail = document.querySelector('.detailWrapper');
-    var slidesInTotal = bandDetailSlider.innerElements.length;
-    var currentSlide = bandDetailSlider.currentSlide;
-    var currentBandId = bandDetailSlider.innerElements[currentSlide].querySelector(".col-12").getAttribute('data-bandId')
-
-    const newElement = document.createElement('div');
-    newElement.className = "detail row w-100 mx-1";
-    newElement.setAttribute('data-id', 1000);
+    var slidesInTotal = bandDetailSlider.slides.length;
+    var currentSlide = bandDetailSlider.activeIndex;
+    var currentBandId = bandDetailSlider.slides[currentSlide].querySelector(".col-12").getAttribute('data-bandId')
+    var newElement = '';
 
     if(currentSlide == slidesInTotal-1){
         var activeBandKey;
@@ -307,8 +315,8 @@ function updateSlids(){
                 "rating": -1
             }
         }
-        newElement.innerHTML = makeBandDetailsHTML(nextBand)
-        bandDetailSlider.append(newElement);
+        newElement = makeBandDetailsHTML(nextBand)
+        bandDetailSlider.appendSlide(newElement);
         console.log("next Made ID=", nextBand.id)
     }
     if (currentSlide == 0) {
@@ -336,8 +344,8 @@ function updateSlids(){
                 "rating": -1
               }
         }
-        newElement.innerHTML = makeBandDetailsHTML(prevBand);
-        bandDetailSlider.prepend(newElement);
+        newElement = makeBandDetailsHTML(prevBand);
+        bandDetailSlider.prependSlide(newElement);
         console.log("prev Made",prevBand.name)
     }
     if(currentBandId < 0){
@@ -350,35 +358,13 @@ function updateSlids(){
 }
 
 function makeDetailView(){
-    document.querySelector('.detailWrapper').innerHTML = bandDetailWrapperHTML;
-
-    bandDetailSlider = new Siema({
-        selector: '.detailWrapper',
-        duration: 200,
-        easing: 'ease-out',
-        perPage: 1,
-        startIndex: 1,
-        draggable: true,
-        multipleDrag: true,
-        threshold: window.innerWidth/2,
-        loop: false,
-        rtl: false,
-        onInit: () => {},
-        onChange: () => {
-            updateSlids();
-        },
-      });
-
-
-
+    const bandDetail = document.querySelector('.detailWrapper');
     var activeBandKey;
     var band = bands.find(function(band,key){
         activeBandKey = key;
         return band.id == document.querySelector('.detailWrapper').getAttribute('data-id')
     });
 
-    document.querySelector('.detail.active').innerHTML = makeBandDetailsHTML(band);
-    
     var next_band = bands.find(function(band,key){
         return key > activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
     });
@@ -388,10 +374,8 @@ function makeDetailView(){
         return key > bands.length - 1 - activeBandKey  && appSettings[1].filterRatings[band.rating] != 0
     });
 
-    if(next_band){
-        document.querySelector('.detail.next').innerHTML = makeBandDetailsHTML(next_band);  
-    } else{
-        var next_filler = {
+    if(!next_band){
+        next_band = {
             "id": -1,
             "name": "SIDSTE BAND",
             "HeadlineScore": -1,
@@ -402,13 +386,9 @@ function makeDetailView(){
             "iframe": "-",
             "rating": -1
           }
-        document.querySelector('.detail.next').innerHTML = makeBandDetailsHTML(next_filler); 
     }
-
-    if(prev_band){
-        document.querySelector('.detail.prev').innerHTML = makeBandDetailsHTML(prev_band);
-    } else{
-        var prev_filler = {
+    if(!prev_band){
+        prev_band = {
             "id": -2,
             "name": "Førsteband BAND",
             "HeadlineScore": -1,
@@ -419,15 +399,17 @@ function makeDetailView(){
             "iframe": "-",
             "rating": -1
           }
-        document.querySelector('.detail.prev').innerHTML = makeBandDetailsHTML(prev_filler);
     }
+
+    bandDetail.innerHTML = makeBandDetailsHTML(prev_band) + makeBandDetailsHTML(band) + makeBandDetailsHTML(next_band);
 }
 
 function clickCloseDetils(){
     const bandDetail = document.querySelector('.detailWrapper');
+    const swiperContainer = document.querySelector('.swiper-container');
      band_card = document.querySelector(`[data-id="${bandDetail.getAttribute('data-id')}"]`);
     
-    var closeDetail = bandDetail.animate([
+    var closeDetail = swiperContainer.animate([
         {
           zIndex: 20,
           transform: `
@@ -452,28 +434,24 @@ function clickCloseDetils(){
       return false;
 }
 
-const bandDetailWrapperHTML = `
-    <div class="detail prev row w-100 mx-1" data-id=""></div>
-    <div class="detail active row w-100 mx-1" data-id=""></div>
-    <div class="detail next row w-100 mx-1" data-id=""></div>
-`;
-
 function makeBandDetailsHTML(activeBand){
     return`
-    <div class="col-12 p-3 d-flex flex-column ${getColor(activeBand.rating)} ${activeBand.id < 0 ? `hidden` : ``}" data-bandid="${activeBand.id}">
-        <div class="d-flex justify-content-between mb-3">
-            <h1>${activeBand.name}</h1>
-            <a class="close-details p-2" onclick="return clickCloseDetils();" href=""><i class="fas fa-times"></i></a>
-        </div>
-        <div class="details_body d-flex flex-column h-100">
-            <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
-            <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
-            <div class="ratebar mt-auto d-flex justify-content-around py-3">
-                <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `activeRating` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
-                <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `activeRating` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
-                <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `activeRating` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
-                <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `activeRating` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
-            </div> 
+    <div class="swiper-slide detail row p-0 m-0" data-id="">
+        <div class="col-12 p-3 d-flex flex-column ${getColor(activeBand.rating)} ${activeBand.id < 0 ? `hidden` : ``}" data-bandid="${activeBand.id}">
+            <div class="d-flex justify-content-between mb-3">
+                <h1>${activeBand.name}</h1>
+                <a class="close-details p-2" onclick="return clickCloseDetils();" href=""><i class="fas fa-times"></i></a>
+            </div>
+            <div class="details_body d-flex flex-column h-100">
+                <div class="iframeContainer bg-loading">${activeBand.iframe}</div>
+                <div class="text-center my-3"><a href="https://open.spotify.com/search/artists/${encodeURI(activeBand.name)}" target='_blank'>Find i spotify</a></div>
+                <div class="ratebar mt-auto d-flex justify-content-around py-3">
+                    <a href="" onclick="return setRating(this, ${activeBand.id},1);" class="${activeBand.rating == 1 ? `activeRating` : ``}""><i class="em-svg ${getIconName(1)}"></i></a>
+                    <a href="" onclick="return setRating(this, ${activeBand.id},2);" class="${activeBand.rating == 2 ? `activeRating` : ``}""><i class="em-svg ${getIconName(2)}"></i></a>
+                    <a href="" onclick="return setRating(this, ${activeBand.id},3);" class="${activeBand.rating == 3 ? `activeRating` : ``}""><i class="em-svg ${getIconName(3)}"></i></a>
+                    <a href="" onclick="return setRating(this, ${activeBand.id},4);" class="${activeBand.rating == 4 ? `activeRating` : ``}""><i class="em-svg ${getIconName(4)}"></i></a>
+                </div> 
+            </div>
         </div>
     </div>
     `

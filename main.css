@@ -104,13 +104,14 @@ h5 {
     -webkit-transform-origin: top;
     transform-origin: top;
 }
-.detailWrapper {
+.swiper-container {
     position: fixed;
     background: rgba(16, 21, 63, 0.5); 
     z-index: 12;
 }
 .detail {
     height: 100vh;
+    min-width: 100vw;
 }
 .detail .hidden {
     opacity: 0;
@@ -157,10 +158,9 @@ h5 {
     filter: grayscale(100%);
 }
 @media screen and (orientation: portrait) {
-    .detailWrapper {
+    .swiper-container {
         top: 0;
         left: 0;
-        right: 0;
         bottom: 0;
     }
 }
@@ -274,3 +274,4 @@ h5 {
         transform: rotate(1turn)
     }
 }
+
