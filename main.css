@@ -104,49 +104,20 @@ h5 {
     -webkit-transform-origin: top;
     transform-origin: top;
 }
-.detailWrapper {
+.swiper-container {
     position: fixed;
-    -webkit-transform-origin: top left;
-    transform-origin: top left;
-    padding: 1rem 2rem;
     background: rgba(16, 21, 63, 0.5); 
-    overflow: auto;
     z-index: 12;
-
-    padding-top: 20vh;
-    padding-bottom: 20vh;
-
-    scroll-snap-type: y mandatory;
-    scroll-padding: 7vh;
-    
-    overflow-y: scroll; /* has to be scroll, not auto */
-    -webkit-overflow-scrolling: touch;
 }
 .detail {
-    position: relative;
-    min-height: 80vh;
-    max-height: 80vh;
-    scroll-snap-align: start;
+    height: 100vh;
+    min-width: 100vw;
 }
-.detail .col-12:after{
-    content: '';
-    background: var(--bg);
-    position: absolute;
-    left: -1rem;
-    right: -1rem;
-    top: -5vh;
-    bottom: -20vh;
-    z-index: -1;
-}
-
-.detail .col-12 {
-    border-radius: 30px;
-}
-.detail .hidden *{
+.detail .hidden {
     opacity: 0;
 }
-.detail .hidden:after {
-    background: rgba(16, 21, 63, 0.6); 
+.details_body {
+    /* max-height: 50%; */
 }
 .close-details{
     color: rgba(2, 9, 49, 0.74);
@@ -190,10 +161,9 @@ h5 {
     filter: grayscale(100%);
 }
 @media screen and (orientation: portrait) {
-    .detailWrapper {
+    .swiper-container {
         top: 0;
         left: 0;
-        right: 0;
         bottom: 0;
     }
 }
@@ -307,3 +277,4 @@ h5 {
         transform: rotate(1turn)
     }
 }
+
