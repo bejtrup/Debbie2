@@ -72,8 +72,9 @@ function checkDbNeedUpdate(db_id, db_url){
         localStorage.setItem('eventUpdateLog', JSON.stringify(eventUpdateLog));
     }
     var eventLastUpdate = eventUpdateLog.find(b=>b.eventId == db_id).lastUpdate;
-    var moreThan24h = nowArray[0] > eventLastUpdate[0] && nowArray[1] >= eventLastUpdate[1] && nowArray[2] >= eventLastUpdate[2] && nowArray[3] > eventLastUpdate[3];
-    
+       
+    var moreThan24h = nowArray[1] > eventLastUpdate[1] || (nowArray[0] > eventLastUpdate[0] && nowArray[3] >= eventLastUpdate[3]); 
+
     if ( !localStorage.getItem("bandsFromStorrage") || JSON.parse(localStorage.getItem("bandsFromStorrage"))[parseInt(db_id)] == undefined || moreThan24h) {
         console.log("time for update bands[]");
         getDB(db_url);
