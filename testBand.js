@@ -130,7 +130,7 @@
       "rating": 0
     },
     {
-      "name": "ANDERSON .PAAK & THE FREE NATIONALS",
+      "name": "ANDERSON",
       "day": 8,
       "date": 7,
       "time": 130,
